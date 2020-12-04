@@ -1,38 +1,324 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
 
+  
+  <title>CSS中的弹性布局(Flexbox) | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="允许你使用CSS3 Flexbox功能的CSS属性原文链接：http:&#x2F;&#x2F;cssreference.io&#x2F;flexbox&#x2F; align-content（flex container属性）定义每个行在flexbox容器(flexbox container)中的对齐方式。 它仅适用于 flex-wrap: wrap 存在的情况下，并且如果有多行的flexbox项目(flexbox item)。 ali">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSS中的弹性布局(Flexbox)">
+<meta property="og:url" content="http://example.com/2017/04/03/flexbox-in-css/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="允许你使用CSS3 Flexbox功能的CSS属性原文链接：http:&#x2F;&#x2F;cssreference.io&#x2F;flexbox&#x2F; align-content（flex container属性）定义每个行在flexbox容器(flexbox container)中的对齐方式。 它仅适用于 flex-wrap: wrap 存在的情况下，并且如果有多行的flexbox项目(flexbox item)。 ali">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2017-04-03T09:47:45.000Z">
+<meta property="article:modified_time" content="2020-12-04T23:40:50.429Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="翻译">
+<meta property="article:tag" content="CSS属性">
+<meta property="article:tag" content="CSS布局">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
-{% block title %} {{ page.title }} | {{ config.title }} {% endblock %}
+<meta name="generator" content="Hexo 5.2.0"></head>
 
-{% block page_class %}page-post-detail{% endblock %}
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-flexbox-in-css" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/04/03/flexbox-in-css/" class="article-date">
+  <time datetime="2017-04-03T09:47:45.000Z" itemprop="datePublished">2017-04-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a>►<a class="article-category-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a>
+  </div>
 
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      CSS中的弹性布局(Flexbox)
+    </h1>
+  
 
-{% block content %}
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>允许你使用CSS3 Flexbox功能的CSS属性<br>原文链接：<a target="_blank" rel="noopener" href="http://cssreference.io/flexbox/">http://cssreference.io/flexbox/</a></p>
+<h1 id="align-content（flex-container属性）"><a href="#align-content（flex-container属性）" class="headerlink" title="align-content（flex container属性）"></a>align-content（flex container属性）</h1><p>定义每个行在flexbox容器(flexbox container)中的对齐方式。 它仅适用于 <strong><em>flex-wrap: wrap</em></strong> 存在的情况下，并且如果有多行的flexbox项目(flexbox item)。</p>
+<h2 id="align-content-stretch-默认值"><a href="#align-content-stretch-默认值" class="headerlink" title="align-content: stretch;//默认值"></a>align-content: stretch;//默认值</h2><p>每行将拉伸以填充剩余空间。<br>在这种情况下，容器的高度为300px。 所有盒子都是50px高，除了第二个是100px高。</p>
+<ul>
+<li>第一行是100px高</li>
+<li>第二行是50px高</li>
+<li>剩余空间为150像素<br>该剩余空间在两行之间平均分布：</li>
+<li>第一行现在是175px高</li>
+<li>第二行现在是125px高</li>
+</ul>
+<p>![align-content: stretch;](/images/align-content: stretch;.png)</p>
+<a id="more"></a>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+<h2 id="align-content-flex-start"><a href="#align-content-flex-start" class="headerlink" title="align-content: flex-start;"></a>align-content: flex-start;</h2><p>每行只会填充所需的空间。它们都将移动到flexbox容器（flexbox container）的垂直的交叉轴的开始位置。<br>![align-content: flex-start;](/images/align-content: flex-start;.png)</p>
+<h2 id="align-content-flex-end"><a href="#align-content-flex-end" class="headerlink" title="align-content: flex-end;"></a>align-content: flex-end;</h2><p>每行只会填充所需的空间。它们都将移动到flexbox容器（flexbox container）的垂直交叉轴的结束位置。<br>![align-content: flex-end;](/images/align-content: flex-end;.png)</p>
+<h2 id="align-content-center"><a href="#align-content-center" class="headerlink" title="align-content: center;"></a>align-content: center;</h2><p>每行只会填充所需的空间。它们都将移动到flexbox容器（flexbox container）的垂直交叉轴的中心位置。<br>![align-content: center;](/images/align-content: center;.png)</p>
+<h2 id="align-content-space-between"><a href="#align-content-space-between" class="headerlink" title="align-content: space-between;"></a>align-content: space-between;</h2><p>每行只会填充所需的空间。剩余空间将出现在两行之间。<br>![align-content: space-between;](/images/align-content: space-between;.png)</p>
+<h2 id="align-content-space-around"><a href="#align-content-space-around" class="headerlink" title="align-content: space-around;"></a>align-content: space-around;</h2><p>每行只会填充所需的空间。剩余的空间将均匀地分布在行间：在第一行之前，在两行之间，在最后一行之后。<br>![align-content: space-around;](/images/align-content: space-around;.png)</p>
+<h1 id="align-items（flex-container属性）"><a href="#align-items（flex-container属性）" class="headerlink" title="align-items（flex container属性）"></a>align-items（flex container属性）</h1><p>定义flexbox项目（flexbox item）如何根据垂直交叉轴在flexbox容器（flexbox container）的一行内对齐。</p>
+<h2 id="align-items-flex-start"><a href="#align-items-flex-start" class="headerlink" title="align-items: flex-start;"></a>align-items: flex-start;</h2><p>flexbox项目（flexbox item）在垂直交叉轴开始位置对齐。<br>默认情况下，交叉轴是垂直的。 这意味着flexbox项目（flexbox item）将在顶部垂直对齐。<br>![align-items: flex-start;](/images/align-items: flex-start;.png)</p>
+<h2 id="align-items-flex-end"><a href="#align-items-flex-end" class="headerlink" title="align-items: flex-end;"></a>align-items: flex-end;</h2><p>flexbox项目（flexbox item）在垂直交叉轴的末端对齐。<br>默认情况下，交叉轴是垂直的。 这意味着flexbox项目（flexbox item）将在底部垂直对齐。<br>![align-items: flex-end;](/images/align-items: flex-end;.png)</p>
+<h2 id="align-items-center"><a href="#align-items-center" class="headerlink" title="align-items: center;"></a>align-items: center;</h2><p>flexbox项目（flexbox item）在垂直交叉轴的中心对齐。<br>默认情况下，交叉轴是垂直的。 这意味着flexbox项目将垂直居中。<br>![align-items: center;](/images/align-items: center;.png)</p>
+<h2 id="align-items-baseline"><a href="#align-items-baseline" class="headerlink" title="align-items: baseline;"></a>align-items: baseline;</h2><p>flexbox项目（flexbox item）在垂直交叉轴的基线处对齐。<br>默认情况下，交叉轴是垂直的。 这意味着flexbox项目（flexbox item）将自己对齐，以使其文本的基线沿着水平线对齐。<br>![align-items: baseline;](/images/align-items: baseline;.png)</p>
+<h2 id="align-items-stretch"><a href="#align-items-stretch" class="headerlink" title="align-items: stretch;"></a>align-items: stretch;</h2><p>flexbox项目（flexbox item）将横跨整个垂直交叉轴拉伸。<br>默认情况下，交叉轴是垂直的。这意味着flexbox项目（flexbox item）将填满整个垂直空间。<br>![align-items: stretch;](/images/align-items: stretch;.png)</p>
+<h1 id="align-self（flex-items属性）"><a href="#align-self（flex-items属性）" class="headerlink" title="align-self（flex items属性）"></a>align-self（flex items属性）</h1><p>像 <strong><em>align-items</em></strong> 一样工作，但仅适用于单个Flexbox项目（flexbox item），而不是其中的所有项目。</p>
+<h2 id="align-self-auto-默认值"><a href="#align-self-auto-默认值" class="headerlink" title="align-self: auto;//默认值"></a>align-self: auto;//默认值</h2><p>Flexbox项目（flexbox item）将使用 <strong><em>align-items</em></strong> 的值。<br>![align-self: auto;](/images/align-self: auto;.png)</p>
+<h2 id="align-self-flex-start"><a href="#align-self-flex-start" class="headerlink" title="align-self: flex-start;"></a>align-self: flex-start;</h2><p>如果父容器设置 <strong><em>align-items: center</em></strong> ，并且Flexbox项目（flexbox item）具有 <strong><em>align-self：flex-start</em></strong>，则目标项目将位于交叉轴的开头位置。<br>默认情况下，这意味着它将在顶部位置垂直对齐。<br>![align-self: flex-start;](/images/align-self: flex-start;.png)</p>
+<h2 id="align-self-flex-end"><a href="#align-self-flex-end" class="headerlink" title="align-self: flex-end;"></a>align-self: flex-end;</h2><p>如果父容器设置 <strong><em>align-items: center</em></strong> ，并且Flexbox项目（flexbox item）具有 <strong><em>align-self: flex-end</em></strong> ，则目标项目将位于交叉轴的末尾位置。<br>默认情况下，这意味着它将在底部位置垂直对齐。<br>![align-self: flex-end;](/images/align-self: flex-end;.png)</p>
+<h2 id="align-self-center"><a href="#align-self-center" class="headerlink" title="align-self: center;"></a>align-self: center;</h2><p>如果父容器设置 <strong><em>align-items: flex-start</em></strong> ，并且Flexbox项目（flexbox item）具有 <strong><em>align-self: center</em></strong>，则目标项目将位于交叉轴的中心位置。<br>默认情况下，这意味着它将垂直居中。<br>![align-self: center;](/images/align-self: center;.png)</p>
+<h2 id="align-self-baseline"><a href="#align-self-baseline" class="headerlink" title="align-self: baseline;"></a>align-self: baseline;</h2><p>如果父容器设置 <strong><em>align-items: center</em></strong> ，并且Flexbox项目（flexbox item）具有 <strong><em>align-self: baseline</em></strong> ，则目标项目将位于交叉轴的基线位置。<br>默认情况下，这意味着它将沿着文本的基线对齐。<br>![align-self: baseline;](/images/align-self: baseline;.png)</p>
+<h2 id="align-self-stretch"><a href="#align-self-stretch" class="headerlink" title="align-self: stretch;"></a>align-self: stretch;</h2><p>如果父容器设置 <strong><em>align-items: center</em></strong> ，并且Flexbox项目（flexbox item）具有 <strong><em>align-self: stretch</em></strong>,则目标项目将沿着整个交叉轴拉伸。<br>![align-self: stretch;](/images/align-self: stretch;.png)</p>
+<h1 id="flex-basis（flex-items属性）"><a href="#flex-basis（flex-items属性）" class="headerlink" title="flex-basis（flex items属性）"></a>flex-basis（flex items属性）</h1><p>定义flexbox项目（flexbox item）的初始大小。</p>
+<h2 id="flex-basis-auto-默认值"><a href="#flex-basis-auto-默认值" class="headerlink" title="flex-basis: auto;//默认值"></a>flex-basis: auto;//默认值</h2><p>该元素将根据其内容自动调整大小，或者在定义任何高度或宽度值时自动调整大小。<br>![flex-basis: auto;](/images/flex-basis: auto;.png)</p>
+<h2 id="flex-basis-80px"><a href="#flex-basis-80px" class="headerlink" title="flex-basis: 80px;"></a>flex-basis: 80px;</h2><p>你可以定义px、rem、em单位值。 该元素将包装其内容以避免任何溢出。<br>![flex-basis: 80px;](/images/flex-basis: 80px;.png)</p>
+<h1 id="flex（flex-items属性）"><a href="#flex（flex-items属性）" class="headerlink" title="flex（flex items属性）"></a>flex（flex items属性）</h1><p><strong><em>flex-grow</em></strong> 、*<strong>flex-shrink*** 、*</strong>flex-basis*** 属性的简写。第二、第三个参数 <strong><em>flex-shrink</em></strong> 、*<strong>flex-basis*** 是可选的。默认值是 *</strong>0 1 auto***。</p>
+<h1 id="flex-direction（flex-container属性）"><a href="#flex-direction（flex-container属性）" class="headerlink" title="flex-direction（flex container属性）"></a>flex-direction（flex container属性）</h1><p>定义所有flexbox项目（flexbox item）在Flexbox容器（flexbox container）中的顺序。</p>
+<h2 id="flex-direction-row-默认值"><a href="#flex-direction-row-默认值" class="headerlink" title="flex-direction: row;//默认值"></a>flex-direction: row;//默认值</h2><p>所有flexbox项目（flexbox item）的顺序与文本方向相同，都沿着主轴方向。<br>![flex-direction: row;](/images/flex-direction: row;.png)</p>
+<h2 id="flex-direction-row-reverse"><a href="#flex-direction-row-reverse" class="headerlink" title="flex-direction: row-reverse;"></a>flex-direction: row-reverse;</h2><p>所有Flexbox项目（flexbox item）沿着主轴方向并以与文本方向相反排列。<br>![flex-direction: row-reverse;](/images/flex-direction: row-reverse;.png)</p>
+<h2 id="flex-direction-column"><a href="#flex-direction-column" class="headerlink" title="flex-direction: column;"></a>flex-direction: column;</h2><p>所有flexbox项目（flexbox item）的排列方式与文本方向相同，沿着交叉轴。<br>![flex-direction: column;](/images/flex-direction: column;.png)</p>
+<h2 id="flex-direction-column-reverse"><a href="#flex-direction-column-reverse" class="headerlink" title="flex-direction: column-reverse;"></a>flex-direction: column-reverse;</h2><p>所有Flexbox项目（flexbox item）沿着交叉轴并与文本方向相反排列。<br>![flex-direction: column-reverse;](/images/flex-direction: column-reverse;.png)</p>
+<h1 id="flex-flow（flex-container属性）"><a href="#flex-flow（flex-container属性）" class="headerlink" title="flex-flow（flex container属性）"></a>flex-flow（flex container属性）</h1><p><strong><em>flex-direction</em></strong> 、**<em>flex-wrap**</em> 属性的简写。</p>
+<h1 id="flex-grow（flex-items属性）"><a href="#flex-grow（flex-items属性）" class="headerlink" title="flex-grow（flex items属性）"></a>flex-grow（flex items属性）</h1><p>定义如果有空间可用，Flexbox项目应该增长多少。</p>
+<h2 id="flex-grow-0-默认值"><a href="#flex-grow-0-默认值" class="headerlink" title="flex-grow: 0;//默认值"></a>flex-grow: 0;//默认值</h2><p>如果有空间可用，元素也不会增长。 它只会使用它需要的空间。<br>![flex-grow: 0;](/images/flex-grow: 0;.png)</p>
+<h2 id="flex-grow-1"><a href="#flex-grow-1" class="headerlink" title="flex-grow: 1;"></a>flex-grow: 1;</h2><p>元素将增长占1份。如果没有其他flexbox项目不设置 <strong><em>flex-grow</em></strong> 的值，它将填满剩余空间。<br>![flex-grow: 1;](/images/flex-grow: 1;.png)</p>
+<h2 id="flex-grow-2"><a href="#flex-grow-2" class="headerlink" title="flex-grow: 2;"></a>flex-grow: 2;</h2><p>因为 <strong><em>flex-grow</em></strong> 值是相对的，它的行为取决于flexbox项目兄弟姐妹元素的值。<br>在这个例子中，剩下的空间分为3份：</p>
+<ul>
+<li>绿色项目占1/3</li>
+<li>粉红色项目占2/3</li>
+<li>黄色项目将不会变化，仍保留原来的宽度</li>
+</ul>
+<p>![flex-grow: 2;](/images/flex-grow: 2;.png)</p>
+<h1 id="flex-shrink（flex-items属性）"><a href="#flex-shrink（flex-items属性）" class="headerlink" title="flex-shrink（flex items属性）"></a>flex-shrink（flex items属性）</h1><p>定义如果没有足够的可用空间，Flexbox项目应该缩减多少。</p>
+<h2 id="flex-shrink-1-默认值"><a href="#flex-shrink-1-默认值" class="headerlink" title="flex-shrink: 1;//默认值"></a>flex-shrink: 1;//默认值</h2><p>如果容器主轴上没有足够的可用空间，则元素将缩小1份，并将其内容包装。<br>![flex-grow: 2;](/images/flex-grow: 2;.png)</p>
+<h2 id="flex-shrink-0"><a href="#flex-shrink-0" class="headerlink" title="flex-shrink: 0;"></a>flex-shrink: 0;</h2><p>该元素不会缩小：它将保留所需的宽度，而且不会包装其内容。 它的兄弟姐妹元素会收缩，给它挤出空间。<br>因为目标元素不会包装其内容，所以Flexbox容器（flexbox container）的内容有可能溢出。<br>![flex-shrink: 0;](/images/flex-shrink: 0;.png)</p>
+<h2 id="flex-shrink-2"><a href="#flex-shrink-2" class="headerlink" title="flex-shrink: 2;"></a>flex-shrink: 2;</h2><p>因为flex-shrink值是相对的，它的行为取决于flexbox项目（flexbox item）兄弟姐妹元素的值。<br>在此示例中，绿色项目要填充宽度的100％。 它需要的空间取自其两个兄弟姐妹元素，所需空间分为4份：</p>
+<ul>
+<li>3/4来自红色项目</li>
+<li>1/4是从黄色项目中取出</li>
+</ul>
+<p>![flex-shrink: 2;](/images/flex-shrink: 2;.png)</p>
+<h1 id="flex-wrap（flex-container属性）"><a href="#flex-wrap（flex-container属性）" class="headerlink" title="flex-wrap（flex container属性）"></a>flex-wrap（flex container属性）</h1><p>定义flexbox项目（flexbox item）是如何显示在一个行或多行的Flexbox容器中。</p>
+<h2 id="flex-wrap-nowrap-默认值"><a href="#flex-wrap-nowrap-默认值" class="headerlink" title="flex-wrap: nowrap;//默认值"></a>flex-wrap: nowrap;//默认值</h2><p>flexbox项目（flexbox item）将保持在一行，无论什么，如果需要，将最终溢出。<br>![flex-wrap: nowrap;](/images/flex-wrap: nowrap;.png)</p>
+<h2 id="flex-wrap-wrap"><a href="#flex-wrap-wrap" class="headerlink" title="flex-wrap: wrap;"></a>flex-wrap: wrap;</h2><p>如果需要，flexbox项目（flexbox item）将分布在多行中。<br>![flex-wrap: wrap;](/images/flex-wrap: wrap;.png)</p>
+<h2 id="flex-wrap-wrap-reverse"><a href="#flex-wrap-wrap-reverse" class="headerlink" title="flex-wrap: wrap-reverse;"></a>flex-wrap: wrap-reverse;</h2><p>如果需要，flexbox项目（flexbox item）将分布在多行中。 后面的行将显示在上一行之前。<br>![flex-wrap: wrap-reverse;](/images/flex-wrap: wrap-reverse;.png)</p>
+<h1 id="justify-content（flex-container属性）"><a href="#justify-content（flex-container属性）" class="headerlink" title="justify-content（flex container属性）"></a>justify-content（flex container属性）</h1><p>定义Flexbox项目（flexbox item）在Flexbox容器中主轴方向上的对齐方式。</p>
+<h2 id="justify-content-flex-start-默认值"><a href="#justify-content-flex-start-默认值" class="headerlink" title="justify-content: flex-start;//默认值"></a>justify-content: flex-start;//默认值</h2><p>Flexbox项目（flexbox item）从父容器主轴的开始位置排列。<br>![justify-content: flex-start;](/images/justify-content: flex-start;.png)</p>
+<h2 id="justify-content-flex-end"><a href="#justify-content-flex-end" class="headerlink" title="justify-content: flex-end;"></a>justify-content: flex-end;</h2><p>Flexbox项目（flexbox item）从父容器主轴的末端位置排列。<br>![justify-content: flex-end;](/images/justify-content: flex-end;.png)</p>
+<h2 id="justify-content-center"><a href="#justify-content-center" class="headerlink" title="justify-content: center;"></a>justify-content: center;</h2><p>Flexbox项目（flexbox item）沿着父容器的主轴居中。<br>![justify-content: center;](/images/justify-content: center;.png)</p>
+<h2 id="justify-content-space-between"><a href="#justify-content-space-between" class="headerlink" title="justify-content: space-between;"></a>justify-content: space-between;</h2><p>剩余的空间分布在flexbox项目（flexbox item）之间。<br>![justify-content: space-between;](/images/justify-content: space-between;.png)</p>
+<h2 id="justify-content-space-around"><a href="#justify-content-space-around" class="headerlink" title="justify-content: space-around;"></a>justify-content: space-around;</h2><p>剩余的空间分布在flexbox项目（flexbox item）周围：这将在第一个项目之前和之后添加空间。<br>![justify-content: space-around;](/images/justify-content: space-around;.png)</p>
+<h1 id="order（flex-items属性）"><a href="#order（flex-items属性）" class="headerlink" title="order（flex items属性）"></a>order（flex items属性）</h1><p>定义flexbox项目（flexbox item）的顺序。</p>
+<h2 id="order-0-默认值"><a href="#order-0-默认值" class="headerlink" title="order: 0;//默认值"></a>order: 0;//默认值</h2><p>flexbox项目（flexbox item）的顺序是HTML代码中定义的。<br>![order: 0;](/images/order: 0;.png)</p>
+<h2 id="order-1"><a href="#order-1" class="headerlink" title="order: 1;"></a>order: 1;</h2><p>该顺序是相对于flexbox项目（flexbox item）的兄弟姐妹元素的。 需要考虑到所有单独的flexbox项目（flexbox item）顺序值，才能定义最终顺序。<br>![order: 1;](/images/order: 1;.png)</p>
+<h2 id="order-1-1"><a href="#order-1-1" class="headerlink" title="order: -1;"></a>order: -1;</h2><p>你可以使用负值。<br>![order: -1;](/images/order: -1;.png)</p>
+<h2 id="order-9"><a href="#order-9" class="headerlink" title="order: 9;"></a>order: 9;</h2><p>你可以为每个flexbox项目（flexbox item）设置不同的值。<br>![order: 9;](/images/order: 9;.png)</p>
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2017/04/03/flexbox-in-css/" data-id="ckiaww49w000lbofzhzd25v07" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/25/box-model-in-css/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          CSS中的盒子模型(box model)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/03/03/max-symmetry-substring/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">求最长子对称字符串算法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/">CSS定位</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/">CSS盒子模型</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/linux/tcp-ip/">tcp/ip</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/think/">think</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/PPTV%E9%9D%A2%E8%AF%95/">PPTV面试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/">类</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></li></ul>
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%AE%9A%E4%BD%8D/" rel="tag">CSS定位</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" rel="tag">CSS盒子模型</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVS/" rel="tag">LVS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/" rel="tag">OS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PPTV%E9%9D%A2%E8%AF%95/" rel="tag">PPTV面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paramiko/" rel="tag">Paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhantomJS/" rel="tag">PhantomJS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/think/" rel="tag">think</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/writeup/" rel="tag">writeup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag">主机存活探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" rel="tag">数据提取</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag">服务器配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B1%87%E7%BC%96/" rel="tag">汇编</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag">编程学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag">网络爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag">网络资产</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+    </div>
+  </div>
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CRC/" style="font-size: 10px;">CRC</a> <a href="/tags/CSS/" style="font-size: 16.67px;">CSS</a> <a href="/tags/CSS%E5%AE%9A%E4%BD%8D/" style="font-size: 10px;">CSS定位</a> <a href="/tags/CSS%E5%B1%9E%E6%80%A7/" style="font-size: 13.33px;">CSS属性</a> <a href="/tags/CSS%E5%B8%83%E5%B1%80/" style="font-size: 10px;">CSS布局</a> <a href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" style="font-size: 10px;">CSS盒子模型</a> <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/C%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">C语言</a> <a href="/tags/Java/" style="font-size: 16.67px;">Java</a> <a href="/tags/LVS/" style="font-size: 10px;">LVS</a> <a href="/tags/Linux/" style="font-size: 16.67px;">Linux</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/PPTV%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">PPTV面试</a> <a href="/tags/PWN/" style="font-size: 13.33px;">PWN</a> <a href="/tags/Paramiko/" style="font-size: 10px;">Paramiko</a> <a href="/tags/PhantomJS/" style="font-size: 10px;">PhantomJS</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/tcp-ip/" style="font-size: 10px;">tcp/ip</a> <a href="/tags/think/" style="font-size: 10px;">think</a> <a href="/tags/writeup/" style="font-size: 10px;">writeup</a> <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">主机存活探测</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">安全学习</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" style="font-size: 10px;">数据提取</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">文件系统</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">服务器配置</a> <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/tags/%E6%B1%87%E7%BC%96/" style="font-size: 10px;">汇编</a> <a href="/tags/%E6%B3%A8%E8%A7%A3/" style="font-size: 10px;">注解</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%B1%BB/" style="font-size: 10px;">类</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" style="font-size: 13.33px;">编程学习</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" style="font-size: 10px;">网络爬虫</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" style="font-size: 10px;">网络资产</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 20px;">翻译</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/05/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/15/2019-2-host-detect-by-port/">主机发现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/10/linux-filesystem-learn1-md/">Linux文件系统学习1</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/">PWN基础知识总结</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/16/2018-8-wp1/">hackme.inndy.tw toooomuch2 writeup</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

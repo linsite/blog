@@ -1,38 +1,299 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
 
+  
+  <title>混合“类”对象（上） | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近在学习“You-Dont-Know-JS”，读到本章：Mixing (Up) “Class” Objects，作者把经典类理论讲得非常透彻，所以翻译出来，我们一起来重温经典的“面向对象编程”理论。此文为上半部分。原文链接：https:&#x2F;&#x2F;github.com&#x2F;getify&#x2F;You-Dont-Know-JS&#x2F;blob&#x2F;master&#x2F;this%20%26%20object%20prototypes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="混合“类”对象（上）">
+<meta property="og:url" content="http://example.com/2017/11/30/mixing-up-class-objects-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="最近在学习“You-Dont-Know-JS”，读到本章：Mixing (Up) “Class” Objects，作者把经典类理论讲得非常透彻，所以翻译出来，我们一起来重温经典的“面向对象编程”理论。此文为上半部分。原文链接：https:&#x2F;&#x2F;github.com&#x2F;getify&#x2F;You-Dont-Know-JS&#x2F;blob&#x2F;master&#x2F;this%20%26%20object%20prototypes">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/class-copy-operation.png">
+<meta property="article:published_time" content="2017-11-30T15:15:42.000Z">
+<meta property="article:modified_time" content="2020-12-04T23:40:50.433Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="翻译">
+<meta property="article:tag" content="类">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/class-copy-operation.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
-{% block title %} {{ page.title }} | {{ config.title }} {% endblock %}
+<meta name="generator" content="Hexo 5.2.0"></head>
 
-{% block page_class %}page-post-detail{% endblock %}
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-mixing-up-class-objects-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/30/mixing-up-class-objects-1/" class="article-date">
+  <time datetime="2017-11-30T15:15:42.000Z" itemprop="datePublished">2017-11-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%B1%BB/">类</a>►<a class="article-category-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a>
+  </div>
 
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      混合“类”对象（上）
+    </h1>
+  
 
-{% block content %}
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近在学习“You-Dont-Know-JS”，读到本章：Mixing (Up) “Class” Objects，作者把经典类理论讲得非常透彻，所以翻译出来，我们一起来重温经典的“面向对象编程”理论。此文为上半部分。<br>原文链接：<a target="_blank" rel="noopener" href="https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch4.md">https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch4.md</a></p>
+<a id="more"></a>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+<p>继上一章的对象之后，我们现在把注意力转向“面向对象（OO）编程”和“类”是很自然的。在研究“实例化”，“继承”和“（相对）多态性”等“类”的机制之前，我们首先将“类定向”作为一种设计模式。</p>
+<p>我们将会看到，这些概念并没有真正地将自然映射到JS中的对象机制，而是许多JavaScript开发人员用来克服这些挑战的长度（mixins等）。</p>
+<p>注意：本章花费了相当长一段时间（上半部分！）来重温经典的“面向对象编程”理论。当我们谈论“Mixins”时，我们最终将这些想法与下半部分真实的具体JavaScript代码联系起来。但是有很多概念和伪代码需要先过，所以不要迷茫 - 只要坚持看下去！</p>
+<h1 id="类理论"><a href="#类理论" class="headerlink" title="类理论"></a>类理论</h1><p>“类/继承”描述了某种形式的代码组织和体系结构 - 在我们的软件中建模真实世界问题域的一种方式。</p>
+<p>OO或面向类的编程强调数据本质上具有相关联的行为（当然，取决于数据的类型和性质，它们是不同的），所以正确的设计是将数据和行为打包（也就是封装）一起。这在正式的计算机科学中有时被称为“数据结构”。</p>
+<p>例如，表示单词或短语的一系列字符通常称为“字符串”。这些字符是数据。但是你几乎从不关心数据，你通常想要用数据做事，所以可以应用到数据上的行为（计算它的长度，附加数据，搜索等）都被设计成一个String类的方法。</p>
+<p>任何给定的字符串只是这个类的一个实例，这意味着它（String类）是一个整齐收集的字符数据和我们可以执行的功能的包装。</p>
+<p>类也意味着对某个数据结构进行分类的方法。我们这样做的方式是将任何给定的结构视为更一般的基本定义的特定变体。</p>
+<p>我们来看一个通常引用的例子来探讨这个分类过程。一辆汽车（car）可以被描述为一个更通用的“类”的东西，被称为车辆（vehicle）的具体实现。</p>
+<p>我们通过定义一个Vehicle类和一个Car类来对这个关系进行建模。</p>
+<p>Vehicle可能的定义包括推进（引擎等），携带人的能力等等，这些都是行为。我们所定义的Vehicle是所有（或大部分）不同类型的车辆（“飞机，火车和汽车”）所共有的所有东西。</p>
+<p>在我们的软件中重新定义每种不同类型的车辆的“携带人”这种车辆基本本质能力可能是没有意义的。相反，我们在Vehicle中定义一次这个能力，然后当我们定义Car的时候，我们只是简单地指出它从基础定义Vehicle“继承”（或“扩展”）。该Car定义被认为是专门的一般Vehicle定义。</p>
+<p>虽然Vehicle和Car是通过类方法方式一起定义其行为，但是在某一个实例中的数据就像特定汽车的车牌号码一样独特。<br>因此，类，继承和实例化出现。</p>
+<p>类的另一个关键概念是“多态性”，它描述了这样一种观点，即父类中的一般行为可以在子类中被覆盖以给出更具体的内容。事实上，相对多态性可以让我们从被覆盖的行为中引用基本行为。</p>
+<p>类理论强烈建议，父类和子类共享一个特定的行为相同的方法名称，以便孩子覆盖父（差异）。正如我们稍后会看到的那样，在JavaScript代码中这样做会让人感到沮丧和代码脆弱。</p>
+<h2 id="“类”设计模式"><a href="#“类”设计模式" class="headerlink" title="“类”设计模式"></a>“类”设计模式</h2><p>你可能从来没有想过类作为“设计模式”，因为最常见的是讨论流行的“OO设计模式”，如“迭代器”，“观察者”，“工厂”，“单例”等。这样，几乎可以假定OO类是实现所有（更高级别）设计模式的底层机制，就像OO是所有（适当）代码的给定基础一样。</p>
+<p>根据程序设计的正规教育程度，你可能听说过“ 过程式编程”是一种描述只包含调用其他函数的程序（又称函数）的代码，没有任何更高的抽象。你可能已经被教导说，类是将过程式的“意大利面代码”转换成格式良好，组织良好的代码的正确方法。</p>
+<p>当然，如果你有“函数式编程”（Monads等）的经验，那么你就很清楚，类只是几种常见设计模式之一。但是对于其他人来说，这可能是你第一次问自己类是否真的是代码的基础，或者是代码的可选抽象。</p>
+<p>有些语言（如Java）不会给你选择，所以它根本不是可选项 - 一切都是一个类。像C / C ++或PHP这样的其他语言可以为你提供面向过程和面向类的语法，而开发者可以选择哪种风格或风格混合。</p>
+<h2 id="JavaScript“类”"><a href="#JavaScript“类”" class="headerlink" title="JavaScript“类”"></a>JavaScript“类”</h2><p>JavaScript在这方面落在哪里？JS已经有了一些像类和类似的语法元素（比如new和instanceof），而在最近的ES6中，有一些增加了，比如class关键字（见附录A）。</p>
+<p>但这是否意味着JavaScript实际上有类？当然：没有。</p>
+<p>因为类是一种设计模式，所以你可以付出相当大的努力（正如我们将在本章其余部分中看到的那样），为大多数古典类的功能实现近似。JS试图通过提供看起来像类的语法来满足设计类的极其普遍的愿望。</p>
+<p>虽然我们可能有一个看起来像类的语法，就好像JavaScript机制正在使用类设计模式对抗你一样，因为在幕后，你构建的机制运行的方式是完全不同的。语法糖及（极广泛使用）JS“类”库去对你隐藏了这个现实很长的路要走，但迟早你将面对一个事实，即你在其他语言中使用的类不像你在JS重新伪造的“类”。</p>
+<p>这可归结为类是软件设计中的可选模式，并且您可以选择是否使用它们。由于许多开发人员对于面向类的软件设计有很强的吸引力，因此我们将在本章的其余部分中探索为了维持使用JS提供的类的错觉需要付出的代价，以及我们遇到的痛点。</p>
+<h1 id="类特性"><a href="#类特性" class="headerlink" title="类特性"></a>类特性</h1><p>在许多面向类的语言中，“标准库”提供了一个“栈”数据结构（push，pop等）作为一个Stack类。这个类将有一个内部的一组变量来存储数据，它将有一个由类提供的一组可公开访问的行为（“方法”），使您的代码能够与（隐藏的）数据交互（增加数据、删除数据等）。</p>
+<p>但是在这样的语言中，你并不真正直接操作Stack（除非提供一个静态类成员引用，这不在我们讨论的范围之内）。该Stack类仅仅是任何堆栈“stack”抽象解释，但它本身不是一个 “堆栈”。在你有一个具体的数据结构需要操作之前，你必须实例化Stack类。</p>
+<h2 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h2><p>传统的“类”和“实例”思维的比喻来自于建筑的建设。</p>
+<p>建筑师计划建筑物的所有特征：多大，多高，多少个窗户以及哪些位置，甚至哪些类型的材料用于墙壁和屋顶。她不一定在意，在这一点上，哪里的建筑将建成，她也不关心有多少建筑副本将建成。</p>
+<p>她也不太关心建筑物的内容 - 家具，墙纸，吊扇等 - 只关心它们将包含什么类型的结构。</p>
+<p>她生产的建筑蓝图只是建筑的平面图。他们实际上并不构成我们可以走进去坐下的建筑。我们需要一个建设者来完成这个任务。当建造建筑物时，建筑商会拿这些计划，并且会严格地遵照它们建造。从一个非常真实的意义上说，他正在将计划中的预期特征复制到实体建筑中。</p>
+<p>一旦完成，建筑物就是蓝图计划的物理实例，希望是一个完美的副本。然后，建筑商可以搬到隔壁的空地上，重新做一遍，创造另一个副本。</p>
+<p>建筑和蓝图之间的关系是间接的。您可以查看蓝图，以了解建筑物的结构，对于直接检查建筑物的任何部分都是不够的。但是，如果你想打开一扇门，你必须自己去建筑物处 - 蓝图只在页面上画线，代表门应该在那里。</p>
+<p>类就是一个蓝图。为了实际得到一个可以与之交互的对象，我们必须从类中构建（也就是“实例化”）一些东西。这种“构造”的最终结果是一个通常称为“实例”的对象，我们可以根据需要直接调用方法并访问任何公共数据属性。</p>
+<p>这个对象是这个类描述的所有特征的一个副本。</p>
+<p>你可能不会期望走进一幢建筑物，在墙上找到一个用于规划建筑物的蓝图副本，尽管蓝图可能在公共档案室存档。同样，你通常不使用一个对象实例来直接访问和操作它的类，但通常至少可以确定一个对象实例来自哪个类。</p>
+<p>考虑一个类与一个对象实例的直接关系更有用，而不是对象实例和它所来自的类之间的任何间接关系。一个类通过复制操作实例化为对象形式。</p>
+<p><img src="/images/class-copy-operation.png" alt="类与对象"></p>
+<p>正如你所看到的，箭头从左到右，从上到下移动，这表示在概念上和物理上发生的复制操作。</p>
+<h2 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h2><p>类的实例由类的特殊方法构造，通常与类的名称相同，称为构造函数。这个方法的显式工作是初始化实例需要的任何信息（状态）。<br>例如，考虑这个松散的伪代码（我发明的语法）的类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class CoolGuy &#123;</span><br><span class="line">	specialTrick &#x3D; nothing</span><br><span class="line"></span><br><span class="line">	CoolGuy( trick ) &#123;</span><br><span class="line">		specialTrick &#x3D; trick</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	showOff() &#123;</span><br><span class="line">		output( &quot;Here&#39;s my trick: &quot;, specialTrick )</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+<p>为了创建一个CoolGuy实例，我们将调用类的构造函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Joe &#x3D; new CoolGuy( &quot;jumping rope&quot; )</span><br><span class="line">Joe.showOff() &#x2F;&#x2F; Here&#39;s my trick: jumping rope</span><br></pre></td></tr></table></figure>
+
+<p>注意到这个CoolGuy类有一个构造函数CoolGuy()，实际上我们说的是我们所说的new CoolGuy(..)。我们从构造函数中得到一个对象（我们类的一个实例），我们可以调用这个方法showOff()，打印出特殊CoolGuy的特殊技巧。</p>
+<p>显然，跳绳让乔成为一个很酷的家伙。</p>
+<p>一个类的构造函数属于这个类，几乎普遍地与这个类同名。另外，几乎总是需要用new来调用构造函数，让语言引擎知道你想要构造一个新的类实例。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2017/11/30/mixing-up-class-objects-1/" data-id="ckiaww4a80018bofz2fxege39" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/13/phantomjs-sso-login/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          PhantomJS SSO单点登录，加Cookie异常情况处理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/11/30/paramiko-larger-file-update/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Paramiko模块大文件上传慢解决方法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/">CSS定位</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/">CSS盒子模型</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/linux/tcp-ip/">tcp/ip</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/think/">think</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/PPTV%E9%9D%A2%E8%AF%95/">PPTV面试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/">类</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></li></ul>
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%AE%9A%E4%BD%8D/" rel="tag">CSS定位</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" rel="tag">CSS盒子模型</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVS/" rel="tag">LVS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/" rel="tag">OS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PPTV%E9%9D%A2%E8%AF%95/" rel="tag">PPTV面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paramiko/" rel="tag">Paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhantomJS/" rel="tag">PhantomJS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/think/" rel="tag">think</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/writeup/" rel="tag">writeup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag">主机存活探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" rel="tag">数据提取</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag">服务器配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B1%87%E7%BC%96/" rel="tag">汇编</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag">编程学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag">网络爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag">网络资产</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+    </div>
+  </div>
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CRC/" style="font-size: 10px;">CRC</a> <a href="/tags/CSS/" style="font-size: 16.67px;">CSS</a> <a href="/tags/CSS%E5%AE%9A%E4%BD%8D/" style="font-size: 10px;">CSS定位</a> <a href="/tags/CSS%E5%B1%9E%E6%80%A7/" style="font-size: 13.33px;">CSS属性</a> <a href="/tags/CSS%E5%B8%83%E5%B1%80/" style="font-size: 10px;">CSS布局</a> <a href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" style="font-size: 10px;">CSS盒子模型</a> <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/C%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">C语言</a> <a href="/tags/Java/" style="font-size: 16.67px;">Java</a> <a href="/tags/LVS/" style="font-size: 10px;">LVS</a> <a href="/tags/Linux/" style="font-size: 16.67px;">Linux</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/PPTV%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">PPTV面试</a> <a href="/tags/PWN/" style="font-size: 13.33px;">PWN</a> <a href="/tags/Paramiko/" style="font-size: 10px;">Paramiko</a> <a href="/tags/PhantomJS/" style="font-size: 10px;">PhantomJS</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/tcp-ip/" style="font-size: 10px;">tcp/ip</a> <a href="/tags/think/" style="font-size: 10px;">think</a> <a href="/tags/writeup/" style="font-size: 10px;">writeup</a> <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">主机存活探测</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">安全学习</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" style="font-size: 10px;">数据提取</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">文件系统</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">服务器配置</a> <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/tags/%E6%B1%87%E7%BC%96/" style="font-size: 10px;">汇编</a> <a href="/tags/%E6%B3%A8%E8%A7%A3/" style="font-size: 10px;">注解</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%B1%BB/" style="font-size: 10px;">类</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" style="font-size: 13.33px;">编程学习</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" style="font-size: 10px;">网络爬虫</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" style="font-size: 10px;">网络资产</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 20px;">翻译</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/05/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/15/2019-2-host-detect-by-port/">主机发现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/10/linux-filesystem-learn1-md/">Linux文件系统学习1</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/">PWN基础知识总结</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/16/2018-8-wp1/">hackme.inndy.tw toooomuch2 writeup</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

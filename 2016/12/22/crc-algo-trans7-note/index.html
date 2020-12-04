@@ -1,38 +1,264 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
 
+  
+  <title>轻松理解CRC差错检测算法七-注解 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="转自我的CSDN 第9部分的补充原因不得不承认把这个系列的翻译继续下去是很有挑战的。最近加班多，多余的精力就比较少了。坚持下去的想法还是有的，但回顾渐忘的初心，做这件事情的意义是在于帮助那些想把CRC算法学明白，而英文又差那么一点的人们，帮助他们从最根本的原理上来理解这个算法系列。我在之前自己看的过程中就发现作者的思路时有跳跃性。我自己在看的时候思路经常出现断续，作者说的标题其实是有点夸大了。不符">
+<meta property="og:type" content="article">
+<meta property="og:title" content="轻松理解CRC差错检测算法七-注解">
+<meta property="og:url" content="http://example.com/2016/12/22/crc-algo-trans7-note/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="转自我的CSDN 第9部分的补充原因不得不承认把这个系列的翻译继续下去是很有挑战的。最近加班多，多余的精力就比较少了。坚持下去的想法还是有的，但回顾渐忘的初心，做这件事情的意义是在于帮助那些想把CRC算法学明白，而英文又差那么一点的人们，帮助他们从最根本的原理上来理解这个算法系列。我在之前自己看的过程中就发现作者的思路时有跳跃性。我自己在看的时候思路经常出现断续，作者说的标题其实是有点夸大了。不符">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/crc2.png">
+<meta property="og:image" content="http://example.com/images/crc3.png">
+<meta property="article:published_time" content="2016-12-22T14:52:10.000Z">
+<meta property="article:modified_time" content="2020-12-04T23:40:50.429Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="CRC">
+<meta property="article:tag" content="注解">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/crc2.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
-{% block title %} {{ page.title }} | {{ config.title }} {% endblock %}
+<meta name="generator" content="Hexo 5.2.0"></head>
 
-{% block page_class %}page-post-detail{% endblock %}
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-crc-algo-trans7-note" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/12/22/crc-algo-trans7-note/" class="article-date">
+  <time datetime="2016-12-22T14:52:10.000Z" itemprop="datePublished">2016-12-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>►<a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a>
+  </div>
 
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      轻松理解CRC差错检测算法七-注解
+    </h1>
+  
 
-{% block content %}
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>转自<a target="_blank" rel="noopener" href="http://blog.csdn.net/u012520854/article/details/53821971">我的CSDN</a></p>
+<h3 id="第9部分的补充"><a href="#第9部分的补充" class="headerlink" title="第9部分的补充"></a>第9部分的补充</h3><h4 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h4><p>不得不承认把这个系列的翻译继续下去是很有挑战的。最近加班多，多余的精力就比较少了。坚持下去的想法还是有的，但回顾渐忘的初心，做这件事情的意义是在于帮助那些想把CRC算法学明白，而英文又差那么一点的人们，帮助他们从最根本的原理上来理解这个算法系列。我在之前自己看的过程中就发现作者的思路时有跳跃性。我自己在看的时候思路经常出现断续，作者说的标题其实是有点夸大了。不符合我的习惯，我的习惯是每一个演进，都有它的原理在里面，可以直接看到，不需要读者再去思考。所以有了动机。<br>为了保持译文的完整和原本的条理，不方便直接在原文中加入大量的注解，另外只有证明我自己确实是理解了这部分，才能说明我翻译的基础是牢固的。所以才有了这一篇，作为原文第9节的注解。这里我会把我理解这部分的思路一步步展现出来。</p>
+<a id="more"></a>
+<h4 id="原文梳理"><a href="#原文梳理" class="headerlink" title="原文梳理"></a>原文梳理</h4><p>第9节作为第8节的进一步，远远没有第8节那么容易理解。第8节，在讲解基本的直接实现的算法，其原理也非常简单，与长除法对应，也就是用移位与异或来实现长除法。第9节中，在第8节直接实现的基础上，作者介绍了表驱动实现。他的思路是，介绍表驱动的2个基础理论：</p>
+<ol>
+<li>由poly和信息的前8位，可以确定第8次迭代后，寄存器的最高位值是0或者1。</li>
+<li>一个特定数a多次在不同的偏移位置与同一数b相异或，得到的结果，与a经过相同的偏移的值相异或后，再与b相异或得到的结果相同。用公式表达就是：<br>[(a &lt;&lt; 1) ^ b] ^ a ^ (a &lt;&lt; 2) ^ (a &lt;&lt; n) =<br>[(a &lt;&lt; 1) ^ a ^ (a &lt;&lt; 2) ^ (a &lt;&lt; n)] ^ b<br>有了这样的两个条件后，作者不厚道地把表驱动实现的伪代码摆了出来。这里的跳跃性太大了，相信许多原文的人都没有搞明白。我要做的就是把这部分空白补上。<h4 id="填补空白"><a href="#填补空白" class="headerlink" title="填补空白"></a>填补空白</h4>填补之前，我们还是把思路再前移动一个环节看下，为什么长除法可以用移位+异或来实现。这样我们的思路就前后衔接，完美无瑕。<br>这个图中展示出的是长除法的计算过程。用伪代码来描述就是：</li>
+<li>把W位除数与被除数左对齐。</li>
+<li>如果被除数不小于除数，即被除数最高位是1,执行第3步。否则执行第4步。</li>
+<li>执行与除数的CRC减法（异或）运算。得到一个差值，这个差值长度一定比除数要短1，即W-1。跳到第5步。</li>
+<li>把除数全部位设0,执行CRC减法运算,自右向左保留W-1位。跳到第5步。</li>
+<li>如果被除数后面还有数位，则在差值尾部补上被除数的下一位，跳到第2步。否则运算结束，得到的最后差，即为余数。<br><img src="/images/crc2.png" alt="长除法"><br>这个算法是如何变为直接实现算法呢？<br>其实不难看出，在上述算法中，第2步中的判断就是关键。我们知道一个好的poly的首位肯定是1。所以要看是否执行异或操作，全看当前与poly对齐时，被除数的最高位是否是1。是1则相异或，0则不异或。<br>那么为什么poly比寄存器要宽1位呢？在长除法的例子中，可以看到与poly对齐时，除数最高位无论是0,还是1,在下次运算中，它都会被抛弃，因为如果1,它与poly相异或得到的是0,如果是0,则与全0异或时得到的还是0。也就是说，无论什么情况下，它都会变成0。<br><img src="/images/crc3.png" alt="poly比寄存器宽1"><br>香农-布朗信息论告诉我们，一个事件的信息量与它发生的概率的对数值成反比，即越可能发生的事情其信息量就越小，必然发生的事情，其信息量就是0了。没有信息量，在信息时代就没有用处了。没有用处，就不需要留下它了。<br>第9节中提到的两个基础，应该很容易理解。我关注的是如何把它们过渡到表驱动实现。<br>表驱动中，信息的处理单元是字节。直接实现中处理的信息单元是位。<br>由于我们关心的是最后余数，也就是信息处理完成后，留在寄存器里的值。中间过程中会发生什么，中间寄存器的值会变成什么，我们并不关心，只要它的值可以传递到最后，参与最后一次异或运算即可。如果没有这个作为跳板，很难明白，为什么可以把位单元操作，变换为字节单元的操作。按照这个目的作为指引。我们看下，结构长除法的例子，看下在运算过程中到底发生了什么。<br>例子中，除数的位宽为5。那么来看下前5次运算。用R代表寄存器,p代表除数。<br>R ^ p ^ (p &gt;&gt; 1) ^ 0 ^ 0<br>得到的余数是01011。没错这就是我们关心的，前5次运算后，寄存器中的值，正是它将直接参与到下个字节中的运算中。<br>按照前面提到的第2个基础，这5次运算可以看作是如下，方便后面引用写作R ^ X：<br>R ^ (p ^ (p &gt;&gt; 1) ^ 0 ^ 0) = R ^ X<br>OK，这里就可以看出为什么这5次运算可以合并为1次 。首先R中的值只会有2^5种可能，也就是0到31。这个情况是可以提前知道的，也是必然的。由于p是提前也知道的，那么与每一个R值对应的前5次的运算是确切可以知道的，也就是X的值是可以提前知道的。X的值就是我们要在表格里索引的值。也就实现了一次处理5个位的信息了。<br>前5个位处理完成后，X与其后信息组成一个新的信息列，重复取前5个来索引得到后面的新余数，最终完成整个表驱动算法。<br>看到这里，相信每个人都已经明白了。:-)</li>
+</ol>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2016/12/22/crc-algo-trans7-note/" data-id="ckiaww49t000ibofz0m3tecp8" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/01/31/positioning-in-css/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          CSS中的定位（position）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/12/20/tcp-ip1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">TCP/IP协议栈工作流1</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/">CSS定位</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/">CSS盒子模型</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/linux/tcp-ip/">tcp/ip</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/think/">think</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/PPTV%E9%9D%A2%E8%AF%95/">PPTV面试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/">类</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></li></ul>
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%AE%9A%E4%BD%8D/" rel="tag">CSS定位</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" rel="tag">CSS盒子模型</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVS/" rel="tag">LVS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/" rel="tag">OS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PPTV%E9%9D%A2%E8%AF%95/" rel="tag">PPTV面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paramiko/" rel="tag">Paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhantomJS/" rel="tag">PhantomJS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/think/" rel="tag">think</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/writeup/" rel="tag">writeup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag">主机存活探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" rel="tag">数据提取</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag">服务器配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B1%87%E7%BC%96/" rel="tag">汇编</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag">编程学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag">网络爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag">网络资产</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+    </div>
+  </div>
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CRC/" style="font-size: 10px;">CRC</a> <a href="/tags/CSS/" style="font-size: 16.67px;">CSS</a> <a href="/tags/CSS%E5%AE%9A%E4%BD%8D/" style="font-size: 10px;">CSS定位</a> <a href="/tags/CSS%E5%B1%9E%E6%80%A7/" style="font-size: 13.33px;">CSS属性</a> <a href="/tags/CSS%E5%B8%83%E5%B1%80/" style="font-size: 10px;">CSS布局</a> <a href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" style="font-size: 10px;">CSS盒子模型</a> <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/C%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">C语言</a> <a href="/tags/Java/" style="font-size: 16.67px;">Java</a> <a href="/tags/LVS/" style="font-size: 10px;">LVS</a> <a href="/tags/Linux/" style="font-size: 16.67px;">Linux</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/PPTV%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">PPTV面试</a> <a href="/tags/PWN/" style="font-size: 13.33px;">PWN</a> <a href="/tags/Paramiko/" style="font-size: 10px;">Paramiko</a> <a href="/tags/PhantomJS/" style="font-size: 10px;">PhantomJS</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/tcp-ip/" style="font-size: 10px;">tcp/ip</a> <a href="/tags/think/" style="font-size: 10px;">think</a> <a href="/tags/writeup/" style="font-size: 10px;">writeup</a> <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">主机存活探测</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">安全学习</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" style="font-size: 10px;">数据提取</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">文件系统</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">服务器配置</a> <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/tags/%E6%B1%87%E7%BC%96/" style="font-size: 10px;">汇编</a> <a href="/tags/%E6%B3%A8%E8%A7%A3/" style="font-size: 10px;">注解</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%B1%BB/" style="font-size: 10px;">类</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" style="font-size: 13.33px;">编程学习</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" style="font-size: 10px;">网络爬虫</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" style="font-size: 10px;">网络资产</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 20px;">翻译</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/05/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/15/2019-2-host-detect-by-port/">主机发现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/10/linux-filesystem-learn1-md/">Linux文件系统学习1</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/">PWN基础知识总结</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/16/2018-8-wp1/">hackme.inndy.tw toooomuch2 writeup</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

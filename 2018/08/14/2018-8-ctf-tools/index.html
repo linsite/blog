@@ -1,38 +1,270 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>CTF PWN工具篇1-pwntools | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="0x00 引子今年5月份参加红帽杯比赛，线下攻防赛，因为不懂PWN类题目，被吊打。很不爽，于是从6月初开始重新学习汇编，操作系统到7月底，算告一段落。参考书上教程，从零完成一个简陋的操作系统，只有一个进程。这个过程中最大的收获是对汇编的深入理解，以及程序加载执行的过程的熟悉。这对PWN来说是非常好的基础。现在开始学习PWN类题目。先来梳理下常用的工具。网上有人介绍过，我自己从初学者的角度来看待，尽">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTF PWN工具篇1-pwntools">
+<meta property="og:url" content="http://example.com/2018/08/14/2018-8-ctf-tools/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="0x00 引子今年5月份参加红帽杯比赛，线下攻防赛，因为不懂PWN类题目，被吊打。很不爽，于是从6月初开始重新学习汇编，操作系统到7月底，算告一段落。参考书上教程，从零完成一个简陋的操作系统，只有一个进程。这个过程中最大的收获是对汇编的深入理解，以及程序加载执行的过程的熟悉。这对PWN来说是非常好的基础。现在开始学习PWN类题目。先来梳理下常用的工具。网上有人介绍过，我自己从初学者的角度来看待，尽">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-08-14T11:00:00.000Z">
+<meta property="article:modified_time" content="2020-12-04T23:40:50.429Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="PWN">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2018-8-ctf-tools" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/14/2018-8-ctf-tools/" class="article-date">
+  <time datetime="2018-08-14T11:00:00.000Z" itemprop="datePublished">2018-08-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      CTF PWN工具篇1-pwntools
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="0x00-引子"><a href="#0x00-引子" class="headerlink" title="0x00 引子"></a>0x00 引子</h2><p>今年5月份参加红帽杯比赛，线下攻防赛，因为不懂PWN类题目，被吊打。很不爽，于是从6月初开始重新学习汇编，操作系统到7月底，算告一段落。参考书上教程，从零完成一个简陋的操作系统，只有一个进程。这个过程中最大的收获是对汇编的深入理解，以及程序加载执行的过程的熟悉。这对PWN来说是非常好的基础。现在开始学习PWN类题目。先来梳理下常用的工具。网上有人介绍过，我自己从初学者的角度来看待，尽可能详尽些。<br>后续会逐个详细介绍在做PWN题中使用到的功能点。</p>
+<a id="more"></a>
+<h2 id="0x01-工具"><a href="#0x01-工具" class="headerlink" title="0x01 工具"></a>0x01 工具</h2><p>古书云：人欲善其事，必先利其器。PWN类题目主要的工具有：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://github.com/Gallopsled/pwntools">pwntools</a>：<br>这是基于Python开发的工具库。可以很方便的进行本地调试，远程利用。在github上可以找到。</li>
+<li>gdb:调试神器</li>
+<li>peda: 基于Python开发的gdb的插件，可以方便地显示当前栈，堆等信息。</li>
+<li>IDA：反汇编逆向的神器，F5一键查看伪代码。<br>目前用到的就这么多，后面有的话，再添加。<h2 id="0x02-pwntools"><a href="#0x02-pwntools" class="headerlink" title="0x02 pwntools"></a>0x02 pwntools</h2><a target="_blank" rel="noopener" href="https://github.com/Gallopsled/pwntools">https://github.com/Gallopsled/pwntools</a>，附上项目的github地址。这种正规的项目，都有完备的使用和开发说明文档，但这些文档太全面，从实用的角度来说，只挑现在用到的功能。  <h3 id="2-1-安装"><a href="#2-1-安装" class="headerlink" title="2.1 安装"></a>2.1 安装</h3>可以方便的使用pip进行安装：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pwntools</span><br></pre></td></tr></table></figure>
+这是在Ubuntu系统下。如果安装过程中遇到问题了可以参考下官方文档<a target="_blank" rel="noopener" href="https://docs.pwntools.com/en/stable/">https://docs.pwntools.com/en/stable/</a>  <h3 id="2-2-pwntools使用的一般流程"><a href="#2-2-pwntools使用的一般流程" class="headerlink" title="2.2 pwntools使用的一般流程"></a>2.2 pwntools使用的一般流程</h3></li>
+<li>使用process/remote建立交互</li>
+<li>通过调试，泄露堆栈信息找到利用点。</li>
+<li>构造Payload利用</li>
+<li>开启交互式shell，完成利用。<br>下面的介绍也是按照这样一个顺序进行。  <h3 id="2-3-process-remote模块"><a href="#2-3-process-remote模块" class="headerlink" title="2.3 process/remote模块"></a>2.3 process/remote模块</h3>PWN题一开始就要建立与可执行程序的交互。这就是通过这两个模块实现的。如果是本地调试的话，就使用process模块，本地调试好了就是远程利用拿FLAG了，用的是remote模块。<br>一般使用pwntools的脚本和可执行文件放在同一目录，方便管理。使用process的过程为：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 引入模块</span><br><span class="line">from pwn import process</span><br><span class="line"># 生成实例</span><br><span class="line">p &#x3D; process(&#39;.&#x2F;pwn&#39;)</span><br><span class="line"></span><br><span class="line"># 向进程发信息, 模拟用户的输入，在输入后添加回车，传递给进程。</span><br><span class="line">p.sendline(&#39;some thing&#39;)</span><br><span class="line"></span><br><span class="line"># 接收进程输出信息</span><br><span class="line"># 交互时，要确定进程的状态，通过recvuntil，确保程序是运行在期望的状态下，</span><br><span class="line"># 可以保证Payload是在合适的时机发送的。</span><br><span class="line">p.recvuntil(&#39;some thing&#39;)</span><br><span class="line"></span><br><span class="line"># 开启交互shell</span><br><span class="line"># 这个时候要确认进程已已经成功get shell了，这个函数能开启一个shell。如果</span><br><span class="line"># Payload 有异常这时脚本会异常中止。</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+<h3 id="2-4-ELF模块"><a href="#2-4-ELF模块" class="headerlink" title="2.4 ELF模块"></a>2.4 ELF模块</h3>大多数CTF比赛中的PWN题是基于Linux下可执行文件的。而Linux下可执行文件的格式为ELF。有时候我们需要从可执行文件中提取出一些有用信息，如函数的相对偏移地址，函数在GOT，PLT表的位置等，包括libc中一个信息。<br>这里再说一下自己对程序和进程的差别的理解。<br>也就是说进程不是简单地把程序拷贝到内存就可以执行了。这当中有许多历史和技术原因。程序是编译好的可执行文件，存在于磁盘上的。它的内容是按段组织的。可以使用objdump -x pwn2来查看。可以看到文件分成好多段，粘过来的格式乱掉了。<br>一般基本的有：   </li>
+</ol>
+<ul>
+<li>.text: 代码段</li>
+<li>.data: 数据段<br>当然用C语言编写得到的可执行程序的段不会只有这2个。如果是汇编的话，就能做到只有这两个段。这里的.text段放的就是程序要执行的代码，是编译好的机器语言。.data段放的是变量，全局变量。因为局部变量是在栈上分配的。除了这两个，还一个header段，是用来说明这个程序的文件格式。<br>需要动态链接的程序还会有以下段：</li>
+<li>.plt: procedure link table, 过程链接表</li>
+<li>.got： global offset table，全局偏移表。<br>当然这两个段跟PWN题强相关的。这两个段用于在加载时，重定位库函数的偏移地址的。可参考这篇文章<a target="_blank" rel="noopener" href="https://blog.csdn.net/linyt/article/details/51635768">聊聊Linux动态链接中的PLT和GOT（１）——何谓PLT与GOT</a></li>
+</ul>
+<p>通过ELF加载了可执行文件，就可以方便地读取一些信息了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">elf &#x3D; ELF(&#39;.&#x2F;pwn&#39;)</span><br><span class="line"># symbols里包含了变量，函数的地址。如果没有开启地址随机化的话，读到的地址，就是其实际加载的地址。</span><br><span class="line">elf.symbols[&#39;system&#39;]</span><br><span class="line"># 也可以读bss段的地址</span><br><span class="line">elf.bss()</span><br></pre></td></tr></table></figure>
+<h3 id="2-5-一些通用的模块"><a href="#2-5-一些通用的模块" class="headerlink" title="2.5 一些通用的模块"></a>2.5 一些通用的模块</h3><p>这些模块用来处理一些细节<br>如大小端字节的处理。这两个模块在由泄露信息生成payload时很好用，不需要再手动将32位数值转化为小端4字节二进制数，同时也方便将人可读的信息转化为机器可识别信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 将32位数值转化为小当前计算机上的表示，x86就是小端得到的是&#x2F;x78&#x2F;x56&#x2F;x34&#x2F;x12</span><br><span class="line">p32(0x12345678)</span><br><span class="line"></span><br><span class="line"># 将32位地址转化为32位int</span><br><span class="line">u32(&#39;\x78\x56\x32\x12&#39;)</span><br></pre></td></tr></table></figure>
 
 
-{% block title %} {{ page.title }} | {{ config.title }} {% endblock %}
 
-{% block page_class %}page-post-detail{% endblock %}
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2018/08/14/2018-8-ctf-tools/" data-id="ckiaww49f0001bofz1qy0hv20" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li></ul>
 
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/08/16/2018-8-wp1/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          hackme.inndy.tw toooomuch2 writeup
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/08/10/2018-8-os1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">写个小操作系统1</div>
+    </a>
+  
+</nav>
 
-{% block content %}
+  
+</article>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
-
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/">CSS定位</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/">CSS盒子模型</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/linux/tcp-ip/">tcp/ip</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/think/">think</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/PPTV%E9%9D%A2%E8%AF%95/">PPTV面试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/">类</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></li></ul>
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%AE%9A%E4%BD%8D/" rel="tag">CSS定位</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" rel="tag">CSS盒子模型</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVS/" rel="tag">LVS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/" rel="tag">OS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PPTV%E9%9D%A2%E8%AF%95/" rel="tag">PPTV面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paramiko/" rel="tag">Paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhantomJS/" rel="tag">PhantomJS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/think/" rel="tag">think</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/writeup/" rel="tag">writeup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag">主机存活探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" rel="tag">数据提取</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag">服务器配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B1%87%E7%BC%96/" rel="tag">汇编</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag">编程学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag">网络爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag">网络资产</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+    </div>
+  </div>
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CRC/" style="font-size: 10px;">CRC</a> <a href="/tags/CSS/" style="font-size: 16.67px;">CSS</a> <a href="/tags/CSS%E5%AE%9A%E4%BD%8D/" style="font-size: 10px;">CSS定位</a> <a href="/tags/CSS%E5%B1%9E%E6%80%A7/" style="font-size: 13.33px;">CSS属性</a> <a href="/tags/CSS%E5%B8%83%E5%B1%80/" style="font-size: 10px;">CSS布局</a> <a href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" style="font-size: 10px;">CSS盒子模型</a> <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/C%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">C语言</a> <a href="/tags/Java/" style="font-size: 16.67px;">Java</a> <a href="/tags/LVS/" style="font-size: 10px;">LVS</a> <a href="/tags/Linux/" style="font-size: 16.67px;">Linux</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/PPTV%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">PPTV面试</a> <a href="/tags/PWN/" style="font-size: 13.33px;">PWN</a> <a href="/tags/Paramiko/" style="font-size: 10px;">Paramiko</a> <a href="/tags/PhantomJS/" style="font-size: 10px;">PhantomJS</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/tcp-ip/" style="font-size: 10px;">tcp/ip</a> <a href="/tags/think/" style="font-size: 10px;">think</a> <a href="/tags/writeup/" style="font-size: 10px;">writeup</a> <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">主机存活探测</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">安全学习</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" style="font-size: 10px;">数据提取</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">文件系统</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">服务器配置</a> <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/tags/%E6%B1%87%E7%BC%96/" style="font-size: 10px;">汇编</a> <a href="/tags/%E6%B3%A8%E8%A7%A3/" style="font-size: 10px;">注解</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%B1%BB/" style="font-size: 10px;">类</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" style="font-size: 13.33px;">编程学习</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" style="font-size: 10px;">网络爬虫</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" style="font-size: 10px;">网络资产</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 20px;">翻译</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/05/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/15/2019-2-host-detect-by-port/">主机发现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/10/linux-filesystem-learn1-md/">Linux文件系统学习1</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/">PWN基础知识总结</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/16/2018-8-wp1/">hackme.inndy.tw toooomuch2 writeup</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

