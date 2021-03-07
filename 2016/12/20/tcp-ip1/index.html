@@ -1,254 +1,656 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
   
 
   
-  <title>TCP/IP协议栈工作流1 | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="转自我的CSDN 1、引子在C语言里，想要使用TCP&#x2F;IP协议来实现一个客户端，必须要遵循以下步骤： 1）创建一个socket1int socket(int family, int type, int protocol) 函数需要三个参数，分别是协议族的编号，socket的类型，和具体的协议类型。如果初始化时还有印象的话，我们的TCP&#x2F;IP协议族属于PF_INET,而TCP socket则属于ST">
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="tcp/ip,操作系统,linux,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="转自我的CSDN 1、引子在C语言里，想要使用TCP/IP协议来实现一个客户端，必须要遵循以下步骤： 1）创建一个socket1int socket(int family, int type, int protocol) 函数需要三个参数，分别是协议族的编号，socket的类型，和具体的协议类型。如果初始化时还有印象的话，我们的TCP/IP协议族属于PF_INET,而TCP socket则属于ST">
+<meta name="keywords" content="tcp&#x2F;ip,操作系统,linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TCP&#x2F;IP协议栈工作流1">
-<meta property="og:url" content="http://example.com/2016/12/20/tcp-ip1/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="转自我的CSDN 1、引子在C语言里，想要使用TCP&#x2F;IP协议来实现一个客户端，必须要遵循以下步骤： 1）创建一个socket1int socket(int family, int type, int protocol) 函数需要三个参数，分别是协议族的编号，socket的类型，和具体的协议类型。如果初始化时还有印象的话，我们的TCP&#x2F;IP协议族属于PF_INET,而TCP socket则属于ST">
-<meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2016-12-20T13:16:02.000Z">
-<meta property="article:modified_time" content="2020-12-04T23:40:50.433Z">
-<meta property="article:author" content="John Doe">
-<meta property="article:tag" content="tcp&#x2F;ip">
-<meta property="article:tag" content="操作系统">
-<meta property="article:tag" content="linux">
+<meta property="og:url" content="http://1codelife.com/2016/12/20/tcp-ip1/index.html">
+<meta property="og:site_name" content="1CodeLife">
+<meta property="og:description" content="转自我的CSDN 1、引子在C语言里，想要使用TCP/IP协议来实现一个客户端，必须要遵循以下步骤： 1）创建一个socket1int socket(int family, int type, int protocol) 函数需要三个参数，分别是协议族的编号，socket的类型，和具体的协议类型。如果初始化时还有印象的话，我们的TCP/IP协议族属于PF_INET,而TCP socket则属于ST">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-03-07T03:15:42.860Z">
 <meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+<meta name="twitter:title" content="TCP&#x2F;IP协议栈工作流1">
+<meta name="twitter:description" content="转自我的CSDN 1、引子在C语言里，想要使用TCP/IP协议来实现一个客户端，必须要遵循以下步骤： 1）创建一个socket1int socket(int family, int type, int protocol) 函数需要三个参数，分别是协议族的编号，socket的类型，和具体的协议类型。如果初始化时还有印象的话，我们的TCP/IP协议族属于PF_INET,而TCP socket则属于ST">
 
-<meta name="generator" content="Hexo 5.2.0"></head>
 
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
-      </h1>
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://1codelife.com/2016/12/20/tcp-ip1/">
+
+  <title> TCP/IP协议栈工作流1 | 1CodeLife </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-91250021-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?826cac467c757190b2c8aa720a31068d";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">1CodeLife</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
       
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
         
-          <a class="main-nav-link" href="/">Home</a>
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
         
-          <a class="main-nav-link" href="/archives">Archives</a>
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
         
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main"><article id="post-tcp-ip1" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/12/20/tcp-ip1/" class="article-date">
-  <time datetime="2016-12-20T13:16:02.000Z" itemprop="datePublished">2016-12-20</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/linux/">linux</a>►<a class="article-category-link" href="/categories/linux/tcp-ip/">tcp/ip</a>
-  </div>
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
 
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      TCP/IP协议栈工作流1
-    </h1>
+      
+    </ul>
   
 
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                TCP/IP协议栈工作流1
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-20T21:16:02+08:00" content="2016-12-20">
+              2016-12-20
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/tcp-ip/" itemprop="url" rel="index">
+                    <span itemprop="name">tcp/ip</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/20/tcp-ip1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/20/tcp-ip1/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
+
+
+    <div class="post-body" itemprop="articleBody">
+
       
-        <p>转自<a target="_blank" rel="noopener" href="http://blog.csdn.net/u012520854/article/details/53750338">我的CSDN</a></p>
+      
+
+      
+        <p>转自<a href="http://blog.csdn.net/u012520854/article/details/53750338" target="_blank" rel="noopener">我的CSDN</a></p>
 <h3 id="1、引子"><a href="#1、引子" class="headerlink" title="1、引子"></a>1、引子</h3><p>在C语言里，想要使用TCP/IP协议来实现一个客户端，必须要遵循以下步骤：</p>
 <h4 id="1）创建一个socket"><a href="#1）创建一个socket" class="headerlink" title="1）创建一个socket"></a>1）创建一个socket</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int socket(int family, int type, int protocol)</span><br></pre></td></tr></table></figure>
-<p>函数需要三个参数，分别是协议族的编号，socket的类型，和具体的协议类型。如果初始化时还有印象的话，我们的TCP/IP协议族属于PF_INET,而TCP socket则属于STREAM_SOCK，protocol这个参数一般是0,使用系统中该socket默认的协议类型。如STREAM_SOCK对应的默认协议就是TCP协议。这里只是内核里面的宏，具体到函数库中，可能会有别的表现形式。<br>函数执行完成，没有错误时，会返回一个int类型的变量，这个变量是socket的ID，与文件ID类似，后续的工作，都是通过对它的引用来开展的。</p>
-<a id="more"></a>
-<h4 id="2）调用connect函数来连接到远程的服务器。"><a href="#2）调用connect函数来连接到远程的服务器。" class="headerlink" title="2）调用connect函数来连接到远程的服务器。"></a>2）调用connect函数来连接到远程的服务器。</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int connect(int sockfd, const struct sockaddr * addr, socklen_t addrlen) &#96;&#96;&#96;</span><br><span class="line">sockfd 就是1）中生成的socket ID。</span><br><span class="line">addr 类型为struct sockaddr，用来描述一个socket的数据结构。这里addr表示要连接的远程服务器的socket描述，包括其服务器的IP地址和端口。</span><br><span class="line">当connect调用完成，没有发生错误时，socket已经完成了TCP&#x2F;IP协议中的三次握手与服务器端的socket建议了连接。</span><br><span class="line">我感兴趣的是TCP&#x2F;IP如何完成的这样的一个过程。有了前面的初始化的基础，梳理它的工作流程显得没有那么困难。</span><br><span class="line">### 2、创建</span><br><span class="line">socket创建函数来自于一个glibc中，glibc是GNU版本的C函数库。C程序里的socket函数怎么到的系统调用，暂且不说。目前只需要最后进入内核的途径如下：</span><br></pre></td></tr></table></figure>
-<p>sys_socketcall(call, args)             net/socket.c 2004<br>sys_socket(a0, a1, a[2])            net/socket.c 1202<br>sock_create(family, type, protocol, &amp;sock)    net/socket.c<br>sock_map_fd(sock)                net/socket.c</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">我们假定传入的参数就是(PF_INET, STREAM_SOCK, 0)。</span><br><span class="line">通过对ICMP协议初始化时的分析，我们知道，最终是sock_create是创建的socket。而后面的sock_map_fd(sock)只是把sock和一个文件关系起来，记得socket函数返回的是一个类似文件的ID。而sock_create返回的是 创建是否成功的标识。关于sock_create的流程有必要再次梳理下，因为这次要创建的是TCP类型的socket。</span><br><span class="line">sock_create定义在net&#x2F;socket.c中，它只是一个包装，真正调用的是__sock_create。传入的参数在ICMP初始化时已经说过不再说明。同样根据参数family解引用，从net_families数组中得到struct net_proto_family类型的变量inet_family_ops。最后执行的是inet_create函数。此时不同的是传入的参数不再一样了。</span><br><span class="line">inet_create(struct net *net, struct socket *sock, int protocol);</span><br><span class="line">此时，由于已经进入到inet内部，family参数已经不再需要了。type参数被包含进入sock中，protocol仍然是0。</span><br><span class="line">&#96;&#96;&#96; 244 static int inet_create(struct net *net, struct socket *sock, int protocol)</span><br><span class="line">245 &#123;</span><br><span class="line">246 	struct sock *sk;</span><br><span class="line">247 	struct list_head *p;</span><br><span class="line">248 	struct inet_protosw *answer;</span><br><span class="line">249 	struct inet_sock *inet;</span><br><span class="line">250 	struct proto *answer_prot;</span><br><span class="line">251 	unsigned char answer_flags;</span><br><span class="line">252 	char answer_no_check;</span><br><span class="line">253 	int try_loading_module &#x3D; 0;</span><br><span class="line">254 	int err;</span><br><span class="line">256 	if (net !&#x3D; &amp;init_net)</span><br><span class="line">257 		return -EAFNOSUPPORT;</span><br><span class="line">259 	if (sock-&gt;type !&#x3D; SOCK_RAW &amp;&amp;</span><br><span class="line">260 	    sock-&gt;type !&#x3D; SOCK_DGRAM &amp;&amp;</span><br><span class="line">261 	    !inet_ehash_secret)</span><br><span class="line">262 		build_ehash_secret();</span><br><span class="line">264 	sock-&gt;state &#x3D; SS_UNCONNECTED;</span><br><span class="line">267 	answer &#x3D; NULL;</span><br><span class="line">268 lookup_protocol:</span><br><span class="line">269 	err &#x3D; -ESOCKTNOSUPPORT;</span><br><span class="line">270 	rcu_read_lock();</span><br><span class="line">271 	list_for_each_rcu(p, &amp;inetsw[sock-&gt;type]) &#123;</span><br><span class="line">272 		answer &#x3D; list_entry(p, struct inet_protosw, list);</span><br><span class="line">275 		if (protocol &#x3D;&#x3D; answer-&gt;protocol) &#123;</span><br><span class="line">276 			if (protocol !&#x3D; IPPROTO_IP)</span><br><span class="line">277 				break;</span><br><span class="line">278 		&#125; else &#123;</span><br><span class="line">280 			if (IPPROTO_IP &#x3D;&#x3D; protocol) &#123;</span><br><span class="line">281 				protocol &#x3D; answer-&gt;protocol;</span><br><span class="line">282 				break;</span><br><span class="line">283 			&#125;</span><br><span class="line">284 			if (IPPROTO_IP &#x3D;&#x3D; answer-&gt;protocol)</span><br><span class="line">285 				break;</span><br><span class="line">286 		&#125;</span><br><span class="line">287 		err &#x3D; -EPROTONOSUPPORT;</span><br><span class="line">288 		answer &#x3D; NULL;</span><br><span class="line">289 	&#125;</span><br><span class="line">313 	err &#x3D; -EPERM;</span><br><span class="line">314 	if (answer-&gt;capability &gt; 0 &amp;&amp; !capable(answer-&gt;capability))</span><br><span class="line">315 		goto out_rcu_unlock;</span><br><span class="line">317 	sock-&gt;ops &#x3D; answer-&gt;ops;</span><br><span class="line">318 	answer_prot &#x3D; answer-&gt;prot;</span><br><span class="line">319 	answer_no_check &#x3D; answer-&gt;no_check;</span><br><span class="line">320 	answer_flags &#x3D; answer-&gt;flags;</span><br></pre></td></tr></table></figure>
-<p>此时需要详细说下这个函数了。<br>256     同样是判断是不是属于init_net命名空间的socket，如是不是返回吧，不支持。<br>269-262    判断参数type的类型。如果既不是SOCK_RAW又不是SOCK_DGRAM，又没有建议过ehash的话，就悄悄地建立了一个散列。也就是说TCP socket也是需要建立这个散列的。也就是SOCK_RAW和SOCK_DGRAM这两种类型是不需要这种散列的。如果前面初始化有印象的话，这里建立的散列是为有连接状态的socket建立的。SOCK_RAW和SOCK_DGRAM都是无状态连接，所以不需要。<br>264    设置sock的状态为SS_UNCONNECTED，意为未连接。SS代表socket state。此时还没有创建完成，所以是未连接状态。<br>270-289    同样是一个协议的查找过程。此时sock-&gt;type为SOCK_STREAM,所以最后检索到的answer如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">913 		.type &#x3D;       SOCK_STREAM,</span><br><span class="line">914 		.protocol &#x3D;   IPPROTO_TCP,</span><br><span class="line">915 		.prot &#x3D;       &amp;tcp_prot,</span><br><span class="line">916 		.ops &#x3D;        &amp;inet_stream_ops,</span><br><span class="line">917 		.capability &#x3D; -1,</span><br><span class="line">918 		.no_check &#x3D;   0,</span><br><span class="line">919 		.flags &#x3D;      INET_PROTOSW_PERMANENT |</span><br><span class="line">920 			      INET_PROTOSW_ICSK,</span><br><span class="line">921 	&#125;</span><br></pre></td></tr></table></figure>
+<p>函数需要三个参数，分别是协议族的编号，socket的类型，和具体的协议类型。如果初始化时还有印象的话，我们的TCP/IP协议族属于PF_INET,而TCP socket则属于STREAM_SOCK，protocol这个参数一般是0,使用系统中该socket默认的协议类型。如STREAM_SOCK对应的默认协议就是TCP协议。这里只是内核里面的宏，具体到函数库中，可能会有别的表现形式。<br>函数执行完成，没有错误时，会返回一个int类型的变量，这个变量是socket的ID，与文件ID类似，后续的工作，都是通过对它的引用来开展的。<br><a id="more"></a></p>
+<h4 id="2）调用connect函数来连接到远程的服务器。"><a href="#2）调用connect函数来连接到远程的服务器。" class="headerlink" title="2）调用connect函数来连接到远程的服务器。"></a>2）调用connect函数来连接到远程的服务器。</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int connect(int sockfd, const struct sockaddr * addr, socklen_t addrlen)</span><br></pre></td></tr></table></figure>
+<p>sockfd 就是1）中生成的socket ID。<br>addr 类型为struct sockaddr，用来描述一个socket的数据结构。这里addr表示要连接的远程服务器的socket描述，包括其服务器的IP地址和端口。<br>当connect调用完成，没有发生错误时，socket已经完成了TCP/IP协议中的三次握手与服务器端的socket建议了连接。<br>我感兴趣的是TCP/IP如何完成的这样的一个过程。有了前面的初始化的基础，梳理它的工作流程显得没有那么困难。</p>
+<h3 id="2、创建"><a href="#2、创建" class="headerlink" title="2、创建"></a>2、创建</h3><p>socket创建函数来自于一个glibc中，glibc是GNU版本的C函数库。C程序里的socket函数怎么到的系统调用，暂且不说。目前只需要最后进入内核的途径如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sys_socketcall(call, args) 			net/socket.c 2004</span><br><span class="line">sys_socket(a0, a1, a[2])			net/socket.c 1202</span><br><span class="line">sock_create(family, type, protocol, &amp;sock)	net/socket.c</span><br><span class="line">sock_map_fd(sock)				net/socket.c</span><br></pre></td></tr></table></figure></p>
+<p>我们假定传入的参数就是(PF_INET, STREAM_SOCK, 0)。<br>通过对ICMP协议初始化时的分析，我们知道，最终是sock_create是创建的socket。而后面的sock_map_fd(sock)只是把sock和一个文件关系起来，记得socket函数返回的是一个类似文件的ID。而sock_create返回的是 创建是否成功的标识。关于sock_create的流程有必要再次梳理下，因为这次要创建的是TCP类型的socket。<br>sock_create定义在net/socket.c中，它只是一个包装，真正调用的是__sock_create。传入的参数在ICMP初始化时已经说过不再说明。同样根据参数family解引用，从net_families数组中得到struct net_proto_family类型的变量inet_family_ops。最后执行的是inet_create函数。此时不同的是传入的参数不再一样了。<br>inet_create(struct net <em>net, struct socket </em>sock, int protocol);<br>此时，由于已经进入到inet内部，family参数已经不再需要了。type参数被包含进入sock中，protocol仍然是0。<br><figure class="highlight plain"><figcaption><span>static int inet_create(struct net *net, struct socket *sock, int protocol)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">245 &#123;</span><br><span class="line">246 	struct sock *sk;</span><br><span class="line">247 	struct list_head *p;</span><br><span class="line">248 	struct inet_protosw *answer;</span><br><span class="line">249 	struct inet_sock *inet;</span><br><span class="line">250 	struct proto *answer_prot;</span><br><span class="line">251 	unsigned char answer_flags;</span><br><span class="line">252 	char answer_no_check;</span><br><span class="line">253 	int try_loading_module = 0;</span><br><span class="line">254 	int err;</span><br><span class="line">256 	if (net != &amp;init_net)</span><br><span class="line">257 		return -EAFNOSUPPORT;</span><br><span class="line">259 	if (sock-&gt;type != SOCK_RAW &amp;&amp;</span><br><span class="line">260 	    sock-&gt;type != SOCK_DGRAM &amp;&amp;</span><br><span class="line">261 	    !inet_ehash_secret)</span><br><span class="line">262 		build_ehash_secret();</span><br><span class="line">264 	sock-&gt;state = SS_UNCONNECTED;</span><br><span class="line">267 	answer = NULL;</span><br><span class="line">268 lookup_protocol:</span><br><span class="line">269 	err = -ESOCKTNOSUPPORT;</span><br><span class="line">270 	rcu_read_lock();</span><br><span class="line">271 	list_for_each_rcu(p, &amp;inetsw[sock-&gt;type]) &#123;</span><br><span class="line">272 		answer = list_entry(p, struct inet_protosw, list);</span><br><span class="line">275 		if (protocol == answer-&gt;protocol) &#123;</span><br><span class="line">276 			if (protocol != IPPROTO_IP)</span><br><span class="line">277 				break;</span><br><span class="line">278 		&#125; else &#123;</span><br><span class="line">280 			if (IPPROTO_IP == protocol) &#123;</span><br><span class="line">281 				protocol = answer-&gt;protocol;</span><br><span class="line">282 				break;</span><br><span class="line">283 			&#125;</span><br><span class="line">284 			if (IPPROTO_IP == answer-&gt;protocol)</span><br><span class="line">285 				break;</span><br><span class="line">286 		&#125;</span><br><span class="line">287 		err = -EPROTONOSUPPORT;</span><br><span class="line">288 		answer = NULL;</span><br><span class="line">289 	&#125;</span><br><span class="line">313 	err = -EPERM;</span><br><span class="line">314 	if (answer-&gt;capability &gt; 0 &amp;&amp; !capable(answer-&gt;capability))</span><br><span class="line">315 		goto out_rcu_unlock;</span><br><span class="line">317 	sock-&gt;ops = answer-&gt;ops;</span><br><span class="line">318 	answer_prot = answer-&gt;prot;</span><br><span class="line">319 	answer_no_check = answer-&gt;no_check;</span><br><span class="line">320 	answer_flags = answer-&gt;flags;</span><br></pre></td></tr></table></figure></p>
+<p>此时需要详细说下这个函数了。<br>256     同样是判断是不是属于init_net命名空间的socket，如是不是返回吧，不支持。<br>269-262    判断参数type的类型。如果既不是SOCK_RAW又不是SOCK_DGRAM，又没有建议过ehash的话，就悄悄地建立了一个散列。也就是说TCP socket也是需要建立这个散列的。也就是SOCK_RAW和SOCK_DGRAM这两种类型是不需要这种散列的。如果前面初始化有印象的话，这里建立的散列是为有连接状态的socket建立的。SOCK_RAW和SOCK_DGRAM都是无状态连接，所以不需要。<br>264    设置sock的状态为SS_UNCONNECTED，意为未连接。SS代表socket state。此时还没有创建完成，所以是未连接状态。<br>270-289    同样是一个协议的查找过程。此时sock-&gt;type为SOCK_STREAM,所以最后检索到的answer如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">913 		.type =       SOCK_STREAM,</span><br><span class="line">914 		.protocol =   IPPROTO_TCP,</span><br><span class="line">915 		.prot =       &amp;tcp_prot,</span><br><span class="line">916 		.ops =        &amp;inet_stream_ops,</span><br><span class="line">917 		.capability = -1,</span><br><span class="line">918 		.no_check =   0,</span><br><span class="line">919 		.flags =      INET_PROTOSW_PERMANENT |</span><br><span class="line">920 			      INET_PROTOSW_ICSK,</span><br><span class="line">921 	&#125;</span><br></pre></td></tr></table></figure></p>
 <p>314-320    同样用得到的answer来初始化sock的成员变量ops，同时记录其他成员到中间变量中。<br>inet_create上半部分又说完了。</p>
 
       
     </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2016/12/20/tcp-ip1/" data-id="ckiaww4ah001ibofz9gzfdg9h" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
 
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tcp-ip/" rel="tag">#tcp/ip</a>
+          
+            <a href="/tags/操作系统/" rel="tag">#操作系统</a>
+          
+            <a href="/tags/linux/" rel="tag">#linux</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/22/crc-algo-trans7-note/" rel="prev" title="轻松理解CRC差错检测算法七-注解">
+                轻松理解CRC差错检测算法七-注解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
     </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
-  
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
     
-<nav id="article-nav">
-  
-    <a href="/2016/12/22/crc-algo-trans7-note/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
+      <div class="ds-thread" data-thread-key="2016/12/20/tcp-ip1/" data-title="TCP/IP协议栈工作流1" data-url="http://1codelife.com/2016/12/20/tcp-ip1/">
+      </div>
+    
+  </div>
+
+
+        </div>
         
-          轻松理解CRC差错检测算法七-注解
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://octodex.github.com/images/skitchtocat.png" alt="Quay & LinLin">
+          <p class="site-author-name" itemprop="name">Quay & LinLin</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">24</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、引子"><span class="nav-number">1.</span> <span class="nav-text">1、引子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）创建一个socket"><span class="nav-number">1.1.</span> <span class="nav-text">1）创建一个socket</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）调用connect函数来连接到远程的服务器。"><span class="nav-number">1.2.</span> <span class="nav-text">2）调用connect函数来连接到远程的服务器。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、创建"><span class="nav-number">2.</span> <span class="nav-text">2、创建</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
         
       </div>
-    </a>
-  
-  
-</nav>
+    </main>
 
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
   
-</article>
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Quay & LinLin</span>
+</div>
 
-</section>
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
         
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/">CSS定位</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%AE%9A%E4%BD%8D/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/">CSS布局</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E5%B8%83%E5%B1%80/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/">CSS盒子模型</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/linux/tcp-ip/">tcp/ip</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/think/">think</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/CRC/">CRC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/PPTV%E9%9D%A2%E8%AF%95/">PPTV面试</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/">类</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B1%BB/%E7%BF%BB%E8%AF%91/">翻译</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></li></ul>
-    </div>
-  </div>
 
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CRC/" rel="tag">CRC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/" rel="tag">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%AE%9A%E4%BD%8D/" rel="tag">CSS定位</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B1%9E%E6%80%A7/" rel="tag">CSS属性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E5%B8%83%E5%B1%80/" rel="tag">CSS布局</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" rel="tag">CSS盒子模型</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag">C语言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LVS/" rel="tag">LVS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OS/" rel="tag">OS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PPTV%E9%9D%A2%E8%AF%95/" rel="tag">PPTV面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/" rel="tag">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paramiko/" rel="tag">Paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhantomJS/" rel="tag">PhantomJS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-ip/" rel="tag">tcp/ip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/think/" rel="tag">think</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/writeup/" rel="tag">writeup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" rel="tag">主机存活探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" rel="tag">安全学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" rel="tag">数据提取</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">文件系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="tag">服务器配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B1%87%E7%BC%96/" rel="tag">汇编</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag">注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B1%BB/" rel="tag">类</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" rel="tag">编程学习</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag">网络爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" rel="tag">网络资产</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/CRC/" style="font-size: 10px;">CRC</a> <a href="/tags/CSS/" style="font-size: 16.67px;">CSS</a> <a href="/tags/CSS%E5%AE%9A%E4%BD%8D/" style="font-size: 10px;">CSS定位</a> <a href="/tags/CSS%E5%B1%9E%E6%80%A7/" style="font-size: 13.33px;">CSS属性</a> <a href="/tags/CSS%E5%B8%83%E5%B1%80/" style="font-size: 10px;">CSS布局</a> <a href="/tags/CSS%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B/" style="font-size: 10px;">CSS盒子模型</a> <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/C%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">C语言</a> <a href="/tags/Java/" style="font-size: 16.67px;">Java</a> <a href="/tags/LVS/" style="font-size: 10px;">LVS</a> <a href="/tags/Linux/" style="font-size: 16.67px;">Linux</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/PPTV%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">PPTV面试</a> <a href="/tags/PWN/" style="font-size: 13.33px;">PWN</a> <a href="/tags/Paramiko/" style="font-size: 10px;">Paramiko</a> <a href="/tags/PhantomJS/" style="font-size: 10px;">PhantomJS</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/tcp-ip/" style="font-size: 10px;">tcp/ip</a> <a href="/tags/think/" style="font-size: 10px;">think</a> <a href="/tags/writeup/" style="font-size: 10px;">writeup</a> <a href="/tags/%E4%B8%BB%E6%9C%BA%E5%AD%98%E6%B4%BB%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">主机存活探测</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 10px;">安全学习</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">操作系统</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8F%90%E5%8F%96/" style="font-size: 10px;">数据提取</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" style="font-size: 10px;">文件系统</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">服务器配置</a> <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/tags/%E6%B1%87%E7%BC%96/" style="font-size: 10px;">汇编</a> <a href="/tags/%E6%B3%A8%E8%A7%A3/" style="font-size: 10px;">注解</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%B1%BB/" style="font-size: 10px;">类</a> <a href="/tags/%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/" style="font-size: 13.33px;">编程学习</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" style="font-size: 10px;">网络爬虫</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E8%B5%84%E4%BA%A7/" style="font-size: 10px;">网络资产</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 20px;">翻译</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2020/12/05/hello-world/">Hello World</a>
-          </li>
-        
-          <li>
-            <a href="/2019/02/15/2019-2-host-detect-by-port/">主机发现方案</a>
-          </li>
-        
-          <li>
-            <a href="/2018/10/10/linux-filesystem-learn1-md/">Linux文件系统学习1</a>
-          </li>
-        
-          <li>
-            <a href="/2018/08/19/2018-8-pwn-basic-knowlegeds/">PWN基础知识总结</a>
-          </li>
-        
-          <li>
-            <a href="/2018/08/16/2018-8-wp1/">hackme.inndy.tw toooomuch2 writeup</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
         
       </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2020 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
     </div>
   </div>
-</footer>
-    </div>
-    <nav id="mobile-nav">
+
   
-    <a href="/" class="mobile-nav-link">Home</a>
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
   
-    <a href="/archives" class="mobile-nav-link">Archives</a>
+
+
+
   
-</nav>
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
     
+  
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"quay"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
 
 
   
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
 
   
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
 
+  
 
+  
 
-
-<script src="/js/script.js"></script>
-
-
-
-
-  </div>
 </body>
 </html>
