@@ -1,0 +1,198 @@
+<html lang="zh-CN">
+    <head>
+        <title>计算24点</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    </head>
+    <body>
+        <div class="container" id="app">
+            <div class="row">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <a class="navbar-brand" href="#">首页</a>
+                  </nav>
+                
+            </div>
+            <div class="row align-items-start mx-auto" >
+                <form class="form-horizontal" role="form">
+                    <div class="alert alert-success">
+                        输入4张扑克牌的点数：如2 3 5 8
+                      </div>
+                    <div class="form-group row">
+                        <label class="col-5">4张扑克牌</label>
+                        <div class="col">
+                            <input type="text" v-model="cards" class="form-control" id="cards" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-5">结果</label>
+                        <div class="col">
+                            <input type="text" v-model="result" class="form-control">
+                        </div>
+                        
+                    </div>
+                    
+                    
+                </form>
+
+            </div>
+
+    
+
+            
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    show: 'get',
+                    cards: '',
+                    result: '',
+                },
+                watch: {
+                    cards: "cardsUpdated",
+                },
+                methods: {
+                    calc: function() {
+                        console.log("start calculate");
+                        console.log(find([8, 2, 3, 5], 24));
+                    },
+                    cardsUpdated: function(newVal, oldVal) {
+                        console.log("new: " + newVal + " old: " + oldVal);
+                        var array = newVal.split(" ");
+                        var args=[];
+                        if (array.length == 4) {
+                            for (i = 0; i < 4; i++) {
+                                j = parseInt(array[i])
+                                if (isNaN(j)) {
+                                    return;
+                                }
+                                args[i] = j;
+                            }
+                            ret = find(args, 24);
+                            if (ret.length > 0) {
+                                app.result = ret + "=24";
+                            } else {
+                                app.result = "没有找到";
+                            }
+                        }
+                    }
+                }
+            });
+
+            function find2(a, b, target) {
+                if ( a * b === target) {
+                    return a + "*" + b;
+                }else if (a + b === target) {
+                    return a + "+" + b;
+                }else if (a % b === 0 || b % a === 0) {
+                    if ( a / b === target) {
+                        return a + "/" + b;
+                    }
+                    if ( b / a === target) {
+                        return b + "/" + a;
+                    }
+                }else if ( a - b == target) {
+                    return a + "-" + b;
+                }
+                else if ( b - a == target) {
+                    return b + "-" + a;
+                }
+                return "";
+            }
+
+            function remove(array, index) {
+                out = []
+                j=0;
+                for(i=0; i<array.length; i++) {
+                    if (i == index) {
+                        continue;
+                    }
+                    out[j] = array[i];
+                    j++;
+                }
+                return out;
+            }
+
+            function find(array, target) {
+                if (array.length == 2) {
+                    out = find2(array[0], array[1], target);
+                    if (out.length > 0) {
+                        return "(" + out + ")";
+                    }
+                    return "";
+                }
+
+                // js 中必须用var声明，限制作用域。
+                var out = "";
+                var ret = "";
+                var i = 0;
+                var left;
+                
+                var x;
+                for (i=0; i<array.length; i++) {
+                    x = array[i];
+                    left = remove(array, i);
+                    console.log(left);
+
+                    if (target != 0 && (target % x == 0 || x % target == 0)) {
+                        if (target > x) {
+                            ret = find(left, target / x) 
+                            if (ret.length > 0) {
+                                out = x + "*" + ret;
+                                break;
+                            }
+                        } else {
+                            ret = find(left, x / target) 
+                            if (ret.length > 0) {
+                                out = x + "/" + ret;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (target > x) {
+                        ret = find(left, target - x);
+                        if (ret.length > 0) {
+                            out = x + "+" + ret;
+                            break
+                        }
+                    } else {
+                        ret = find(left, x - target) ;
+                        if (ret.length > 0) {
+                            out = x + "-" + ret;
+                            break;
+                        }
+                    }
+
+                    ret = find(left, x * target);
+                    if (ret.length > 0) {
+                        out = ret + "/" + x;
+                        break;
+                    }
+                    ret = find(left, target + x);
+                    if (ret.length > 0) {
+                        out = ret + "-" + x;
+                        break;
+                    }
+                }
+
+                if (out.length > 0) {
+                    if (array.length == 4) {
+                        return out;
+                    } else {
+                        return "(" + out + ")";
+                    }
+                } 
+                return "";
+            }
+            
+        </script>
+    </body>
+    
+</html>
