@@ -1,7 +1,7 @@
 hexo generate
+msg=$(git log --pretty=format:"%s" HEAD -1)
 cp -R public/* deploy/linsite.github.io
-cp source/CNAME public
 cd deploy/linsite.github.io
 git add .
-git commit -m “update”
+git commit -m "$msg"
 #git push origin master
