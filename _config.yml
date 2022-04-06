@@ -3,16 +3,16 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 1CodeLife
+title: Quay & LinLin's blog
 subtitle:
 description:
 author: Quay & LinLin
-language: zh-Hans
+language: zh-CN
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://1codelife.com
+url: https://blog.tkfun.site
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -73,5 +73,5 @@ google_analytics: UA-91250021-1
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/theseawolves/theseawolves.github.io.git
-  branch: master
+  repo: git@github.com:linsite/linsite.github.io.git
+  branch: new
