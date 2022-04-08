@@ -16,7 +16,10 @@ LVM是Linux中一个很有用的特性，可以动态地扩展磁盘逻辑分区
 目标是sdc
 
 ## 0x02 对其进行分区
-使用CentOS中的命令fdis
+
+使用CentOS中的命令fdisk
+
+<!--more-->
 ```
 [root@localhost ~]# fdisk /dev/sdc
 Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel
