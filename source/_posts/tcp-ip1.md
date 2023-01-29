@@ -2,12 +2,12 @@
 title: TCP/IP协议栈工作流1
 date: 2016-12-20 21:16:02
 tags:
-- tcp/ip
+- TCP/IP
 - 操作系统
-- linux
+- Linux
 categories:
-- linux
-- tcp/ip
+- Linux
+- TCP/IP
 author: Lin
 ---
 

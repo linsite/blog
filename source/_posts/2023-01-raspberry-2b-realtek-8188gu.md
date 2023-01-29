@@ -2,8 +2,8 @@
 title: 树莓派2B安装Realtek 8188GU 无线网卡驱动
 date: 2023-01-29 17:47:50
 tags:
-  - linux
-  - raspberry
+  - Linux
+  - Raspberry
   - 树莓派
   - 驱动
 ---
