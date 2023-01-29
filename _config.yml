@@ -3,10 +3,10 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Quay & LinLin's blog
+title: LinLin's blog
 subtitle:
 description:
-author: Quay & LinLin
+author: LinLin
 language: zh-CN
 timezone:
 
@@ -44,10 +44,7 @@ highlight:
   tab_replace:
 
 # Category & Tag
-default_category: CSS定位
-category_map:
-  CSS定位
-  翻译
+default_category: Linux
 tag_map:
 
 # Date / Time format
