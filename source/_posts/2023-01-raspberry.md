@@ -11,6 +11,7 @@ description: 在树莓派下把玩的一些记录，希望能帮到需要的人�
 
 
 ## 1 无线网卡
+### 1.1 8188GU
 
 旧的树莓派想重新安装下系统，不小心买了一个8188GU的网卡，结果找了一圈，没 Linux 主线的驱动。在网上找了一波，找到了这个，[https://github.com/McMCCRU/rtl8188gu](https://github.com/McMCCRU/rtl8188gu)，看起来风评还不错。试了下，最终因为CPU资源占用高没用，把这个网卡退了，没有精力去研究驱动的问题。这里记录下编译使用过程的问题，希望能帮到需要的同学。
 
@@ -21,4 +22,10 @@ description: 在树莓派下把玩的一些记录，希望能帮到需要的人�
 2. 编译时出错提示 "No rule to make target 'scripts/module.lds"。原因是没有在源码中执行`make modules_prepare`。
 3. 安装好驱动，成功连上了 Wifi。但有个问题，有个内核线程"RTW_CMD_THREAD"，一直在跑，占了快一个核心，这我接受不了。所以还是退了吧。
 
+### 1.2 电源输出功率过小
 
+买好的 8188CU USB网卡不能识别，内核有以下异常日志：
+
+"under-voltage detected"
+
+更换了5V2A的充电器后才OK。
