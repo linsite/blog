@@ -5,6 +5,7 @@ tags:
 - 网络资产
 - 主机存活探测
 author: lin
+description: 网络资产探测中主机发现的实现方案分析。
 ---
 
 # 0x00 介绍

@@ -5,6 +5,7 @@ tags:
   - k8s
   - apiserver
 author: linlin
+description: k8s APIServer 的相关选项总结。
 ---
 
 apiserver设计比较复杂，直接去看源码效果较差。尝试从特性角度梳理其设计背后的考量。

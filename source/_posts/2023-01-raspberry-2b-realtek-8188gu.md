@@ -6,6 +6,7 @@ tags:
   - Raspberry
   - 树莓派
   - 驱动
+description: 在树莓派2B下安装8188GU 无线网络驱动的尝试过程。
 ---
 
 

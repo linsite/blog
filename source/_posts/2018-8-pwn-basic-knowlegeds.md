@@ -6,6 +6,7 @@ tags:
 - PWN
 - C语言
 author: ulin
+description: 二进制题目基础知识总结。
 ---
 # 0x00 Intro
 这里记录一些在CTF PWN类题目经常要考虑的技术点，是一些与C/ASM相关，比较底层的东西。总结来说有：

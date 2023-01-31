@@ -6,6 +6,7 @@ tags:
 - go
 catergories:
 - 编程语言
+description: Go 非阻塞通道的研究。
 ---
 
 ## 0x01 通道阻塞介绍
