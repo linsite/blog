@@ -1,16 +1,16 @@
 ---
-title: 树莓派2B安装Realtek 8188GU 无线网卡驱动
+title: 树莓派折腾记录
 date: 2023-01-29 17:47:50
 tags:
   - Linux
   - Raspberry
   - 树莓派
   - 驱动
-description: 在树莓派2B下安装8188GU 无线网络驱动的尝试过程。
+description: 在树莓派下把玩的一些记录，希望能帮到需要的人。
 ---
 
 
-<!--more-->
+## 1 无线网卡
 
 旧的树莓派想重新安装下系统，不小心买了一个8188GU的网卡，结果找了一圈，没 Linux 主线的驱动。在网上找了一波，找到了这个，[https://github.com/McMCCRU/rtl8188gu](https://github.com/McMCCRU/rtl8188gu)，看起来风评还不错。试了下，最终因为CPU资源占用高没用，把这个网卡退了，没有精力去研究驱动的问题。这里记录下编译使用过程的问题，希望能帮到需要的同学。
 
