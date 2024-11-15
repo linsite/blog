@@ -71,4 +71,4 @@ google_analytics: UA-91250021-1
 deploy:
   type: git
   repo: git@github.com:linsite/linsite.github.io.git
-  branch: new
+  branch: main
